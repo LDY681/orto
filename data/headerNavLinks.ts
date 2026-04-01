@@ -10,25 +10,25 @@ const headerNavLinks = [
     title: 'Resources',
     hrefs: [
       {
-        title: 'OPEN-SOURCE SOFTWARE TOOLS',
-        href: '/resource/open-source-software-tools',
+        title: 'AI MODELS',
+        href: '/resource/ai-models',
       },
       {
         title: 'OPEN-SOURCE DATABASES',
         href: '/resource/open-source-databases',
       },
       {
-        title: 'PROTOCOLS AND INITIATIVES',
-        href: '/resource/protocols-and-initiatives',
-      },
-      {
         title: 'OPEN-SCIENCE GENERAL RESOURCES',
         href: '/resource/open-science-general-resources',
       },
       {
-        title: 'AI MODELS',
-        href: '/resource/ai-models',
+        title: 'OPEN-SOURCE SOFTWARE TOOLS',
+        href: '/resource/open-source-software-tools',
       },
+      {
+        title: 'PROTOCOLS AND INITIATIVES',
+        href: '/resource/protocols-and-initiatives',
+      }
     ],
   },
   { href: '/contact', title: 'Contact' },
