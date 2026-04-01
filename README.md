@@ -43,6 +43,25 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Edit the layout in `app` or content in `data`. With live reloading, the pages auto-updates as you edit them.
 
+# Page Structure
+for blog/tags
+list using: listlayoutwithtags: http://localhost:3000/tags/tag
+post using: postbanner/postlayout/postsimple
+
+for publication
+list using listlayoutwithtopics: http://localhost:3000/topics/topic
+
+for resource
+list using listlayoutwithcategories http://localhost:3000/resource/category/subcategory
+
+difference between three listlayout:
+blog - listlayoutwithtags: + tags underneath the listitem
+publication - listlayoutwithtopics: + topics + DOI/PMID underneath the listitem
+resource - listlayoutwithcategories + subcategories in a category
+
+## TODO
+subcategories need to be restored since previously only one category was allowed for each resource item
+
 ## Extend / Customize
 
 `data/siteMetadata.js` - contains most of the site related information which should be modified for a user's need.

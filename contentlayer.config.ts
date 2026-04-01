@@ -89,19 +89,20 @@ function createResourceCount(files) {
     // Skip draft files if in production
     if (!isProduction || file.draft !== true) {
       const formattedCategory = slug(file.category);
-      const formattedTopic = slug(file.topic);
 
       // Ensure the category exists
       if (!recordCount[formattedCategory]) {
         recordCount[formattedCategory] = {};
       }
 
-      // Ensure the topic exists
-      if (!recordCount[formattedCategory][formattedTopic]) {
-        recordCount[formattedCategory][formattedTopic] = 0;
-      }
-
-      recordCount[formattedCategory][formattedTopic] += 1;
+      // Ensure the subcategory/topic exists
+      file.topics.forEach((topic) => {
+        const formattedTopic = slug(topic);
+        if (!recordCount[formattedCategory][formattedTopic]) {
+          recordCount[formattedCategory][formattedTopic] = 0;
+        }
+          recordCount[formattedCategory][formattedTopic] += 1;
+      });
     }
   });
 
@@ -188,7 +189,7 @@ export const Resource = defineDocumentType(() => ({
   fields: {
     title: { type: 'string', required: true },
     date: { type: 'date', required: true },
-    topic: { type: 'string', required: true },
+    topics: { type: 'list', of: { type: 'string' }, required: true },
     category: { type: 'string', required: true },
     href: { type: 'string' },
     draft: { type: 'boolean' },

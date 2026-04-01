@@ -34,13 +34,12 @@ export default async function CategoryPage(props: {
   // Capitalize first letter and convert space to dash
   const title = category[0].toUpperCase() + category.split(' ').join('-').slice(1)
 
-  // Return posts that matches the category and topic
   const filteredPosts = sortPosts(
     allResources.filter((post) => {
       if (post.category && post.topics) {
         const hypenatedCategory = post.category.split(' ').join('-').toLowerCase()
-        const hypenatedTopics = post.topics.map((t) => slug(t))
-        return hypenatedCategory == category && hypenatedTopics.includes(topic)
+        const hypenatedTopic = post.topics.find((t) => t === topic || slug(t) === topic)?.split(' ').join('-').toLowerCase()
+        return hypenatedCategory == category && hypenatedTopic == topic
       }
       return process.env.NODE_ENV !== 'production' || !post.draft
     })

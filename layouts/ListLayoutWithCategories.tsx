@@ -135,7 +135,7 @@ export default function ListLayoutWithCategories({
                           </div>
                           <MDXLayoutRenderer code={code} />
                           <div className="flex flex-wrap">
-                            {topics?.map((topic) => <Category key={topic} text={topic} category={category} />)}
+                            {topics?.map((topic) => <Category key={topic} topic={topic} category={category} />)}
                           </div>
                         </div>
                         {href && (
