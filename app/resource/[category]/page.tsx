@@ -31,6 +31,7 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
   // Capitalize first letter and convert space to dash
   const title = category[0].toUpperCase() + category.split(' ').join('-').slice(1)
 
+  // Return posts that matches the category
   const filteredPosts = sortPosts(
     allResources.filter((post) => {
       if (post.category) {
