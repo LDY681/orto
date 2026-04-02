@@ -33,6 +33,14 @@
 		],
 		"description": "Insert a link as [here]",
 		"include": ["**/*.mdx"]
+	},
+	"Links to anywhere": {
+		"prefix": "link",
+		"body": [
+			"<a className=\"text-primary-400 underline\" target=\"_blank\" href=\"${1:URL}\">${2:Text}</a>"
+		],
+		"description": "Insert a link as [${2:Text}]",
+		"include": ["**/*.mdx"]
 	}
 
 }
