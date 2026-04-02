@@ -140,7 +140,7 @@ export default function ListLayoutWithCategories({
                             {topics?.map((topic) => <Category key={topic} topic={topic} category={category} />)}
                           </div>
                         </div>
-                        <RatingsAndComments slug={post.title} />
+                        <RatingsAndComments slug={title} />
                         {href && (
                           <Link href={href} className="text-sm font-medium text-primary-400">
                             Learn More -&gt;
