@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { collection, addDoc } from 'firebase/firestore'
+import { db } from "app/firebase"
 
 interface RatingModalProps {
   isOpen: boolean
@@ -22,8 +24,8 @@ const STAR_FILLED = (
   >
     <path
       d="M10 1L12.363 6.911L18.5 7.424L13.5 11.536L14.726 17.5L10 14.175L5.274 17.5L6.5 11.536L1.5 7.424L7.637 6.911L10 1Z"
-      fill="primary"
-      stroke="primary"
+      fill="orange"
+      stroke="orange"
       strokeLinejoin="round"
     />
   </svg>
@@ -35,7 +37,7 @@ const STAR_OUTLINED = (
     height="20"
     viewBox="0 0 20 20"
     fill="none"
-    stroke="currentColor"
+    stroke="orange"
     strokeWidth="1"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -43,7 +45,7 @@ const STAR_OUTLINED = (
     <path
       d="M10 1L12.363 6.911L18.5 7.424L13.5 11.536L14.726 17.5L10 14.175L5.274 17.5L6.5 11.536L1.5 7.424L7.637 6.911L10 1Z"
       fill="none"
-      stroke="primary"
+      stroke="orange"
       strokeLinejoin="round"
     />
   </svg>
@@ -52,14 +54,14 @@ const STAR_OUTLINED = (
 const STAR_HALVED = (<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="green" strokeWidth="1" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="halfFill" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="50%" stopColor="primary" />
+      <stop offset="50%" stopColor="orange" />
       <stop offset="50%" stopColor="transparent" />
     </linearGradient>
   </defs>
   
   <path d="M10 1l2.5 5.5h6l-4.5 4 1.5 6-5.5-3.5-5.5 3.5 1.5-6-4.5-4h6z" 
         fill="url(#halfFill)" 
-        stroke="primary" 
+        stroke="orange" 
         strokeWidth="1" 
         strokeLinejoin="round"/>
 </svg>)
@@ -85,17 +87,28 @@ const QUESTIONS = [
   } },
 ]
 
+const INPUTS = [
+  { id: 'name', label: 'Full Name', placeholder: 'Enter your full name', type: 'text' },
+  { id: 'email', label: 'Email Address', placeholder: 'Enter your email', type: 'email' },
+]
+
 const RatingModal = ({
   isOpen,
   selectedRating,
   slug,
   onClose,
-  onSubmit,
 }: RatingModalProps) => {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleOptionChange = (questionId: string, option: string) => {
+  const isSubmissionValid = useMemo(() => {
+    // For all questions and inputs, check if there is an answer provided
+    const allQuestionAnswered = QUESTIONS.every(q => answers[q.id])
+    const allInputsFilled = INPUTS.every(i => answers[i.id] && answers[i.id].trim() !== '')
+    return allQuestionAnswered && allInputsFilled
+  }, [answers])
+
+  const handleAnswerChange = (questionId: string, option: string) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: option,
@@ -105,9 +118,13 @@ const RatingModal = ({
   const handleSubmit = async () => {
     setIsSubmitting(true)
     try {
-      await onSubmit({
+      await addDoc(collection(db, 'ratings'), {
+        title: slug,
         rating: selectedRating,
-        answers,
+        // for answers and input, store each entry as separate field in the document
+        ...Object.fromEntries(Object.entries(answers).map(([key, value]) => [`${key}`, value])),
+        createdAt: new Date(),
+        status: 'pending'
       })
       onClose()
       setAnswers({})
@@ -150,9 +167,9 @@ const RatingModal = ({
           </div>
         </div>
 
-        <div className="space-y-6 mb-8">
+        <div className="space-y-6">
           {QUESTIONS.map((q) => (
-            <div key={q.id} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0">
+            <div key={q.id} className="border-b border-gray-200 dark:border-gray-700 pb-6">
               <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">{q.question}</p>
               <div className="flex gap-4">
                 {Object.keys(q.options).map((option) => (
@@ -162,13 +179,30 @@ const RatingModal = ({
                       name={q.id}
                       value={option}
                       checked={answers[q.id] === option}
-                      onChange={(e) => handleOptionChange(q.id, e.target.value)}
+                      onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500 dark:text-primary-400"
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">{option}</span>
                   </label>
                 ))}
               </div>
+            </div>
+          ))}
+        </div>
+        <div className="space-x-6 flex flex-row my-6">
+          {INPUTS.map((i) => (
+            <div key={i.id}>
+              <label className='text-sm font-medium text-gray-900 dark:text-white'>
+                {i.label}
+              </label>
+              <input
+                className="mt-2 rounded-md focus:border-primary-500 dark:focus:border-gray-500"
+                onChange={(e) => handleAnswerChange(i.id, e.target.value)}
+                type={i.type}
+                id={i.id}
+                placeholder={i.placeholder}
+                required
+              />
             </div>
           ))}
         </div>
@@ -183,7 +217,7 @@ const RatingModal = ({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={isSubmitting}
+            disabled={!isSubmissionValid || isSubmitting}
             className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Rating'}

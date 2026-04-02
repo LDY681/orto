@@ -73,14 +73,14 @@ function roundToHalf(value: number) {
 
 const Rating = ({ rating, ratingCount, slug }: RatingProps) => {
   const starsRef = useRef<HTMLDivElement>(null)
-  const [averageRating, setAverageRating] = useState<number | null>(clampRating(rating))
+  const [averageRating, setAverageRating] = useState<number>(0)
   const [totalRatings, setTotalRatings] = useState<number | null>(ratingCount)
-  const [hoverRating, setHoverRating] = useState<number | null>(null)
+  const [hoverRating, setHoverRating] = useState<number>(0)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [selectedRating, setSelectedRating] = useState<number>(0)
 
   // Show average rating by default but display user rating is user is hovering
-  const displayedRating = hoverRating ?? averageRating
+  const displayRating = hoverRating ?? averageRating
 
   const ratingSummary = useMemo(() => {
     return `${averageRating !== null ? averageRating.toFixed(1) : '0.0'}/5 (${totalRatings} ratings)`
@@ -106,7 +106,7 @@ const Rating = ({ rating, ratingCount, slug }: RatingProps) => {
   }
 
   const handlePointerLeave = () => {
-    setHoverRating(null)
+    setHoverRating(0)
   }
 
   const handleClick = async (event: React.MouseEvent<HTMLDivElement>) => {
@@ -123,7 +123,6 @@ const Rating = ({ rating, ratingCount, slug }: RatingProps) => {
     setSelectedRating(selectedRating)
   }
 
-
   return (
     <div className="flex">
       <div
@@ -137,12 +136,12 @@ const Rating = ({ rating, ratingCount, slug }: RatingProps) => {
       >
         {[...Array(5)].map((_, index) => (
           <span key={index}>
-            {index < Math.floor(displayedRating) ? STAR_FILLED : index < displayedRating ? STAR_HALVED : STAR_OUTLINED}
-          </span>
+            {index < Math.floor(displayRating) ? STAR_FILLED : index < displayRating ? STAR_HALVED : STAR_OUTLINED}
+          </span> 
         ))}
       </div>
       <span className="ml-2 text-sm text-gray-500">{ratingSummary}</span>
-      <RatingModal isOpen={isModalOpen} selectedRating={selectedRating} slug={slug} onClose={() => setIsModalOpen(false)} onSubmit={async () => {}} />
+      <RatingModal isOpen={isModalOpen} selectedRating={selectedRating} slug={slug} onClose={() => setIsModalOpen(false)} />
     </div>
   )
 }

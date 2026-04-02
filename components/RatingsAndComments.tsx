@@ -15,6 +15,11 @@ const commentIcon = (
   </svg>
 )
 
+//! Gicus cannot abstract elements in the same page with pathname or url, as a workaround, change the title of the page as identifier
+const changeTitle = (slug: string) => {
+  document.title = slug + ' | ' + siteMetadata.title
+}
+
 export default function RatingsAndComments({ slug }: { slug: string }) {
   const [loadComments, setLoadComments] = useState(false)
 
@@ -25,7 +30,7 @@ export default function RatingsAndComments({ slug }: { slug: string }) {
     <>
       <div className="flex justify-start items-center gap-2">
         <Rating rating={4.5} ratingCount={10} slug={slug} />
-        <div className='flex flex-1 justify-end pr-2'>
+        <a className='flex flex-1 justify-end pr-2' href={`#${slug}`} onClick={() => changeTitle(slug)}>
           <button
             aria-label="Scroll To Comment"
             onClick={() => setLoadComments(!loadComments)}
@@ -33,7 +38,7 @@ export default function RatingsAndComments({ slug }: { slug: string }) {
           >
             {commentIcon}
           </button>
-        </div>
+        </a>
     
       </div>
       {loadComments && (
