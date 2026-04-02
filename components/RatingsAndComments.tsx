@@ -23,23 +23,22 @@ const changeTitle = (slug: string) => {
 export default function RatingsAndComments({ slug }: { slug: string }) {
   const [loadComments, setLoadComments] = useState(false)
 
-  if (!siteMetadata.comments?.provider) {
-    return null
-  }
   return (
     <>
       <div className="flex justify-start items-center gap-2">
         <Rating rating={4.5} ratingCount={10} slug={slug} />
-        <a className='flex flex-1 justify-end pr-2' href={`#${slug}`} onClick={() => changeTitle(slug)}>
-          <button
-            aria-label="Scroll To Comment"
-            onClick={() => setLoadComments(!loadComments)}
-            className="rounded-full bg-gray-200 p-2 text-gray-500 transition-all hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
-          >
-            {commentIcon}
-          </button>
-        </a>
-    
+        {/* ! Temporary disabled, see siteMetadata */}
+        { siteMetadata?.comments?.provider && (
+          <a className='flex flex-1 justify-end pr-2' href={`#${slug}`} onClick={() => changeTitle(slug)}>
+            <button
+              aria-label="Scroll To Comment"
+              onClick={() => setLoadComments(!loadComments)}
+              className="rounded-full bg-gray-200 p-2 text-gray-500 transition-all hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
+            >
+              {commentIcon}
+            </button>
+          </a>
+        )}
       </div>
       {loadComments && (
         <CommentsComponent commentsConfig={siteMetadata.comments} slug={slug} />
