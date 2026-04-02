@@ -9,6 +9,8 @@ import Link from '@/components/Link'
 import categoryData from 'app/category-data.json'
 import { MDXLayoutRenderer } from 'pliny/mdx-components'
 import Category from '@/components/Category'
+import RatingsAndComments from '@/components/RatingsAndComments'
+
 interface PaginationProps {
   totalPages: number
   currentPage: number
@@ -138,6 +140,7 @@ export default function ListLayoutWithCategories({
                             {topics?.map((topic) => <Category key={topic} topic={topic} category={category} />)}
                           </div>
                         </div>
+                        <RatingsAndComments slug={post.title} />
                         {href && (
                           <Link href={href} className="text-sm font-medium text-primary-400">
                             Learn More -&gt;

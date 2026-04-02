@@ -15,7 +15,7 @@ const siteMetadata = {
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
 
   // footer contact information
-  email: 'Danuta.sampson@lei.org.au',
+  email: 'orto@gmail.com',
   // github: 'https://github.com',
   x: 'https://x.com/damasampson',
   // facebook: 'https://facebook.com',
