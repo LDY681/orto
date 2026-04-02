@@ -5,6 +5,7 @@ import { useState } from 'react'
 import siteMetadata from '@/data/siteMetadata'
 
 export default function Comments({ slug }: { slug: string }) {
+  // console.log(slug)
   const [loadComments, setLoadComments] = useState(true)
 
   if (!siteMetadata.comments?.provider) {
