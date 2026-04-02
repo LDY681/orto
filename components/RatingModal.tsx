@@ -1,15 +1,15 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { collection, addDoc } from 'firebase/firestore'
-import { db } from "app/firebase"
+import { db } from 'app/firebase'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 interface RatingModalProps {
   isOpen: boolean
   selectedRating: number
   slug: string
   onClose: () => void
-  onSubmit: (data: { rating: number; answers: Record<string, string> }) => Promise<void>
 }
 
 const STAR_FILLED = (
@@ -100,6 +100,9 @@ const RatingModal = ({
 }: RatingModalProps) => {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const recaptchaRef = useRef<ReCAPTCHA | null>(null)
 
   const isSubmissionValid = useMemo(() => {
     // For all questions and inputs, check if there is an answer provided
@@ -113,14 +116,24 @@ const RatingModal = ({
       ...prev,
       [questionId]: option,
     }))
+    if (submitError) {
+      setSubmitError(null)
+    }
   }
 
   const handleSubmit = async () => {
+    if (!captchaToken) {
+      setSubmitError('Please complete reCAPTCHA before submitting.')
+      return
+    }
+
     setIsSubmitting(true)
+    setSubmitError(null)
     try {
       await addDoc(collection(db, 'ratings'), {
         title: slug,
         rating: selectedRating,
+        recaptchaToken: captchaToken,
         // for answers and input, store each entry as separate field in the document
         ...Object.fromEntries(Object.entries(answers).map(([key, value]) => [`${key}`, value])),
         createdAt: new Date(),
@@ -128,10 +141,18 @@ const RatingModal = ({
       })
       onClose()
       setAnswers({})
+      setCaptchaToken(null)
+      recaptchaRef.current?.reset()
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to submit rating.')
+      setCaptchaToken(null)
+      recaptchaRef.current?.reset()
     } finally {
       setIsSubmitting(false)
     }
   }
+
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''
 
   if (!isOpen) return null
 
@@ -192,7 +213,7 @@ const RatingModal = ({
         <div className="space-x-6 flex flex-row my-6">
           {INPUTS.map((i) => (
             <div key={i.id}>
-              <label className='text-sm font-medium text-gray-900 dark:text-white'>
+              <label className="text-sm font-medium text-gray-900 dark:text-white">
                 {i.label}
               </label>
               <input
@@ -206,6 +227,24 @@ const RatingModal = ({
             </div>
           ))}
         </div>
+
+        <div className="my-4">
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={recaptchaSiteKey}
+            onChange={(token) => {
+              setCaptchaToken(token)
+              if (submitError) {
+                setSubmitError(null)
+              }
+            }}
+            onExpired={() => setCaptchaToken(null)}
+          />
+        </div>
+
+        {submitError && (
+          <p className="mb-3 text-sm text-red-600 dark:text-red-400">{submitError}</p>
+        )}
 
         <div className="flex gap-3 justify-end border-t border-gray-200 dark:border-gray-700 pt-6">
           <button

@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
+import type { MouseEvent, PointerEvent } from 'react'
 import RatingModal from './RatingModal'
 
 interface RatingProps {
@@ -98,7 +99,7 @@ const Rating = ({ rating, ratingCount, slug }: RatingProps) => {
   }
 
   // On hover: change rating position to user pointer
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const value = getPointerRating(event.clientX)
     if (value !== null) {
       setHoverRating(value)
@@ -109,7 +110,7 @@ const Rating = ({ rating, ratingCount, slug }: RatingProps) => {
     setHoverRating(0)
   }
 
-  const handleClick = async (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = async (event: MouseEvent<HTMLDivElement>) => {
     const value = getPointerRating(event.clientX)
     if (value !== null) {
       openRatingModal(slug, value)

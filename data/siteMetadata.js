@@ -28,6 +28,13 @@ const siteMetadata = {
   locale: 'en-US',
   // set to true if you want a navbar fixed to the top
   stickyNav: false,
+
+  //! TODO currently trusted domains disabled for testing, re-enable after ready for production
+  recaptcha: {
+    siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+    secretKey: process.env.NEXT_PUBLIC_RECAPTCHA_SECRET_KEY,
+  },
+
   analytics: {
     googleAnalytics: {
       googleAnalyticsId: 'G-T93B9735NH', // e.g. G-XXXXXXX
