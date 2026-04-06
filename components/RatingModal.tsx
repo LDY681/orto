@@ -133,7 +133,8 @@ const RatingModal = ({
       await addDoc(collection(db, 'ratings'), {
         title: slug,
         rating: selectedRating,
-        recaptchaToken: captchaToken,
+        // recaptchaToken: captchaToken,
+        comment: answers['comments'] || '',
         // for answers and input, store each entry as separate field in the document
         ...Object.fromEntries(Object.entries(answers).map(([key, value]) => [`${key}`, value])),
         createdAt: new Date(),
@@ -217,7 +218,7 @@ const RatingModal = ({
                 {i.label}
               </label>
               <input
-                className="mt-2 rounded-md focus:border-primary-500 dark:focus:border-gray-500"
+                className="mt-2 rounded-md focus:border-primary-500 dark:focus:border-gray-500 text-gray-500 dark:text-gray-500"
                 onChange={(e) => handleAnswerChange(i.id, e.target.value)}
                 type={i.type}
                 id={i.id}
@@ -226,6 +227,17 @@ const RatingModal = ({
               />
             </div>
           ))}
+        </div>
+        <div className="flex flex-col my-6">
+          <label className="flex-1 text-sm font-medium text-gray-900 dark:text-white">
+            Comments
+          </label>
+          <textarea
+            className="flex-1 mt-2 rounded-md focus:border-primary-500 dark:focus:border-gray-500 text-gray-500 dark:text-gray-500"
+            onChange={(e) => handleAnswerChange('comments', e.target.value)}
+            id="comments"
+            placeholder="Enter your comments (Optional)"
+          />
         </div>
 
         <div className="my-4">

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>New Rating of {{ title }} from {{ name }}</title>
+</head>
+<body>
+  <h2>You have received a new rating for {{ title }} from {{ name }}! </h2>
+  <p style="font-weight: 600"> Rating: {{ rating }} </p>
+  <p> Ease of Use: {{ ease_of_use }} </p>
+  <p> Expectation: {{ expectation }} </p>
+  <p> Setup Difficulty: {{ setup_difficulty }} </p>
+  <p> Usefulness: {{ usefulness }} </p>
+  <p style="font-weight: 600"> Comments:</p>
+  <p style="font-weight: 400">{{ comments }}</p>
+  <p> Create At: {{ createdAt }} </p>
+  <h3>To approve this rating, please check the following link:</h3>
+  <a href="{{ approvalLink }}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Approve Rating</a>
+</body>
+</html>
