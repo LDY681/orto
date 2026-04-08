@@ -5,8 +5,8 @@ import type { MouseEvent, PointerEvent } from 'react'
 import RatingModal from './RatingModal'
 
 interface RatingProps {
-  rating: number
-  ratingCount: number
+  average: number
+  count: number
   slug: string
 }
 
@@ -72,20 +72,18 @@ function roundToHalf(value: number) {
   return Math.round(value * 2) / 2
 }
 
-const Rating = ({ rating, ratingCount, slug }: RatingProps) => {
+const Rating = ({ average, count, slug }: RatingProps) => {
   const starsRef = useRef<HTMLDivElement>(null)
-  const [averageRating, setAverageRating] = useState<number>(0)
-  const [totalRatings, setTotalRatings] = useState<number | null>(ratingCount)
-  const [hoverRating, setHoverRating] = useState<number>(0)
+  const [hoverRating, setHoverRating] = useState<number | 0>(average)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const [selectedRating, setSelectedRating] = useState<number>(0)
+  const [selectedRating, setSelectedRating] = useState<number | 0>(0)
 
   // Show average rating by default but display user rating is user is hovering
-  const displayRating = hoverRating ?? averageRating
+  const displayRating = hoverRating ?? average
 
   const ratingSummary = useMemo(() => {
-    return `${averageRating !== null ? averageRating.toFixed(1) : '0.0'}/5 (${totalRatings} ratings)`
-  }, [averageRating, totalRatings])
+    return `${average !== null ? average.toFixed(1) : '0.0'}/5 (${count} ratings)`
+  }, [average, count])
 
   // Get relative rating based on clientX position
   const getPointerRating = (clientX: number) => {
@@ -106,13 +104,15 @@ const Rating = ({ rating, ratingCount, slug }: RatingProps) => {
     }
   }
 
+  // On hover leave: reset to average rating
   const handlePointerLeave = () => {
-    setHoverRating(0)
+    setHoverRating(average)
   }
 
   const handleClick = async (event: MouseEvent<HTMLDivElement>) => {
     const value = getPointerRating(event.clientX)
     if (value !== null) {
+      setHoverRating(value)
       openRatingModal(slug, value)
     }
   }
