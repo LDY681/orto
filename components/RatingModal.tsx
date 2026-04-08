@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { collection, doc, setDoc } from 'firebase/firestore'
 import { db } from 'app/firebase'
 import ReCAPTCHA from 'react-google-recaptcha'
@@ -99,7 +99,7 @@ const RatingModal = ({
   onClose,
 }: RatingModalProps) => {
   const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<null | 'pending' | 'success' | 'error'>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const recaptchaRef = useRef<ReCAPTCHA | null>(null)
@@ -110,6 +110,15 @@ const RatingModal = ({
     const allInputsFilled = INPUTS.every(i => answers[i.id] && answers[i.id].trim() !== '')
     return allQuestionAnswered && allInputsFilled
   }, [answers])
+  
+  useEffect(() => {
+    if (isOpen) {
+      setAnswers({})
+      setSubmitStatus(null)
+      setSubmitError(null)
+      setCaptchaToken(null)
+    }
+  }, [isOpen])
 
   const handleAnswerChange = (questionId: string, option: string) => {
     setAnswers((prev) => ({
@@ -127,8 +136,9 @@ const RatingModal = ({
       return
     }
 
-    setIsSubmitting(true)
+    setSubmitStatus('pending')
     setSubmitError(null)
+
     try {
       const currDate = new Date()
       const timestamp = currDate.toISOString()
@@ -141,7 +151,6 @@ const RatingModal = ({
         createdAt: new Date(),
         status: 'pending'
       })
-      onClose()
       setAnswers({})
       setCaptchaToken(null)
       recaptchaRef.current?.reset()
@@ -150,7 +159,7 @@ const RatingModal = ({
       setCaptchaToken(null)
       recaptchaRef.current?.reset()
     } finally {
-      setIsSubmitting(false)
+      setSubmitStatus('success')
     }
   }
 
@@ -189,71 +198,83 @@ const RatingModal = ({
             </div>
           </div>
         </div>
-
-        <div className="space-y-6">
-          {QUESTIONS.map((q) => (
-            <div key={q.id} className="border-b border-gray-200 dark:border-gray-700 pb-6">
-              <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">{q.question}</p>
-              <div className="flex gap-4">
-                {Object.keys(q.options).map((option) => (
-                  <label key={option} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={q.id}
-                      value={option}
-                      checked={answers[q.id] === option}
-                      onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                      className="w-4 h-4 text-primary-500 focus:ring-primary-500 dark:text-primary-400"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{option}</span>
-                  </label>
-                ))}
-              </div>
+        
+        {submitStatus !== 'success' ? (
+          <div>
+            <div className="space-y-6">
+              {QUESTIONS.map((q) => (
+                <div key={q.id} className="border-b border-gray-200 dark:border-gray-700 pb-6">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">{q.question}</p>
+                  <div className="flex gap-4">
+                    {Object.keys(q.options).map((option) => (
+                      <label key={option} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name={q.id}
+                          value={option}
+                          checked={answers[q.id] === option}
+                          onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                          className="w-4 h-4 text-primary-500 focus:ring-primary-500 dark:text-primary-400"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="space-x-6 flex flex-row my-6">
-          {INPUTS.map((i) => (
-            <div key={i.id}>
-              <label className="text-sm font-medium text-gray-900 dark:text-white">
-                {i.label}
+            <div className="space-x-6 flex flex-row my-6">
+              {INPUTS.map((i) => (
+                <div key={i.id}>
+                  <label className="text-sm font-medium text-gray-900 dark:text-white">
+                    {i.label}
+                  </label>
+                  <input
+                    className="mt-2 rounded-md focus:border-primary-500 dark:focus:border-gray-500 text-gray-500 dark:text-gray-500"
+                    onChange={(e) => handleAnswerChange(i.id, e.target.value)}
+                    type={i.type}
+                    id={i.id}
+                    placeholder={i.placeholder}
+                    required
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col my-6">
+              <label className="flex-1 text-sm font-medium text-gray-900 dark:text-white">
+                Comments
               </label>
-              <input
-                className="mt-2 rounded-md focus:border-primary-500 dark:focus:border-gray-500 text-gray-500 dark:text-gray-500"
-                onChange={(e) => handleAnswerChange(i.id, e.target.value)}
-                type={i.type}
-                id={i.id}
-                placeholder={i.placeholder}
-                required
+              <textarea
+                className="flex-1 mt-2 rounded-md focus:border-primary-500 dark:focus:border-gray-500 text-gray-500 dark:text-gray-500"
+                onChange={(e) => handleAnswerChange('comments', e.target.value)}
+                id="comments"
+                placeholder="Enter your comments (Optional)"
               />
             </div>
-          ))}
-        </div>
-        <div className="flex flex-col my-6">
-          <label className="flex-1 text-sm font-medium text-gray-900 dark:text-white">
-            Comments
-          </label>
-          <textarea
-            className="flex-1 mt-2 rounded-md focus:border-primary-500 dark:focus:border-gray-500 text-gray-500 dark:text-gray-500"
-            onChange={(e) => handleAnswerChange('comments', e.target.value)}
-            id="comments"
-            placeholder="Enter your comments (Optional)"
-          />
-        </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4 p-4">
+            <h2 className="text-lg font-bold">Thank you for your feedback!</h2>
+            <p>Your response is now submitted and will be available once approved.</p>
+          </div>
+        )}
 
-        <div className="my-4">
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey={recaptchaSiteKey}
-            onChange={(token) => {
-              setCaptchaToken(token)
+
+        {submitStatus !== 'success' && (
+          <div className="my-4">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={recaptchaSiteKey}
+              onChange={(token) => {
+                setCaptchaToken(token)
               if (submitError) {
                 setSubmitError(null)
               }
-            }}
-            onExpired={() => setCaptchaToken(null)}
-          />
+              }}
+              onExpired={() => setCaptchaToken(null)}
+            />
         </div>
+        )}
 
         {submitError && (
           <p className="mb-3 text-sm text-red-600 dark:text-red-400">{submitError}</p>
@@ -262,18 +283,20 @@ const RatingModal = ({
         <div className="flex gap-3 justify-end border-t border-gray-200 dark:border-gray-700 pt-6">
           <button
             onClick={onClose}
-            disabled={isSubmitting}
+            disabled={submitStatus === 'pending'}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={!isSubmissionValid || isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit Rating'}
-          </button>
+           {submitStatus !== 'success' && (
+            <button
+              onClick={handleSubmit}
+              disabled={!isSubmissionValid || submitStatus === 'pending'}
+              className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitStatus === 'pending' ? 'Submitting...' : 'Submit Rating'}
+            </button>
+           )}
         </div>
       </div>
     </div>

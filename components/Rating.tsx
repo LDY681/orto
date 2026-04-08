@@ -119,7 +119,6 @@ const Rating = ({ average, count, slug }: RatingProps) => {
 
   const openRatingModal = (slug: string, selectedRating: number) => {
     // Hook this to your real API once ready.
-    console.log('submit rating: ', slug, selectedRating)
     setIsModalOpen(true)
     setSelectedRating(selectedRating)
   }
