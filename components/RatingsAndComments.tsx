@@ -20,13 +20,19 @@ const changeTitle = (slug: string) => {
   document.title = slug + ' | ' + siteMetadata.title
 }
 
-export default function RatingsAndComments({ slug }: { slug: string }) {
+interface RatingsAndCommentsProps {
+  slug: string,
+  total?: number,
+  average?: number,
+  count?: number
+}
+export default function RatingsAndComments({ slug, total = 0, average = 0, count = 0 }: RatingsAndCommentsProps) {
   const [loadComments, setLoadComments] = useState(false)
 
   return (
     <>
       <div className="flex justify-start items-center gap-2">
-        <Rating rating={4.5} ratingCount={10} slug={slug} />
+        <Rating average={average} count={count} slug={slug} />
         {/* ! Temporary disabled, see siteMetadata */}
         { siteMetadata?.comments?.provider && (
           <a className='flex flex-1 justify-end pr-2' href={`#${slug}`} onClick={() => changeTitle(slug)}>

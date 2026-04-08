@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 'use client'
 
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { slug } from 'github-slugger'
 import type { Resource } from 'contentlayer/generated'
@@ -10,6 +11,8 @@ import categoryData from 'app/category-data.json'
 import { MDXLayoutRenderer } from 'pliny/mdx-components'
 import Category from '@/components/Category'
 import RatingsAndComments from '@/components/RatingsAndComments'
+import { httpsCallable } from 'firebase/functions'
+import { functions } from 'app/firebase'
 
 interface PaginationProps {
   totalPages: number
@@ -77,7 +80,59 @@ export default function ListLayoutWithCategories({
   const categoryKeys = Object.keys(categoryCounts)
   const sortedCategorys = categoryKeys.sort((a, b) => categoryCounts[b] - categoryCounts[a])
 
-  const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts
+  const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts as Resource[]
+  const [sortedDisplayPosts, setSortedDisplayPosts] = useState<Resource[]>([] as Resource[])
+
+  useEffect(() => {
+    const fetchAndSortPosts = async () => {
+      try {
+        //! Use fetch instead of firebase.httpsCallable as its post only and cant do caching
+        // Project-specific constants
+        const FUNCTION_REGION = "australia-southeast1";
+        const PROJECT_ID = "orto-blog";
+        const ratingResponse = await fetch(`https://${FUNCTION_REGION}-${PROJECT_ID}.cloudfunctions.net/getRatingsAvg`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(res => res.json())
+
+        const ratingsResult = ratingResponse.data ?? {}
+
+        // Merge ratings data into posts
+        const postsWithRatings = displayPosts.map((post) => {
+          const ratingData = ratingsResult[post.title] || {}
+          return {
+            ...post,
+            rating_total: ratingData.total || 0,
+            rating_average: ratingData.average || 0,
+            rating_count: ratingData.count || 0,
+          }
+        })
+
+        const sortedPosts = [...postsWithRatings].sort((a, b) => {
+          const ratingA = a.rating_average ?? 0
+          const ratingB = b.rating_average ?? 0
+          const countA = a.rating_count ?? 0
+          const countB = b.rating_count ?? 0
+
+          // Rating by average then by count
+          if (ratingB === ratingA) {
+            return countB - countA
+          }
+          return ratingB - ratingA
+        })
+
+        setSortedDisplayPosts(sortedPosts)
+      } catch (error) {
+        console.error('Error fetching ratings:', error)
+        setSortedDisplayPosts(displayPosts)
+      }
+    }
+    fetchAndSortPosts()
+    // return () => {}
+  }, [displayPosts])
 
   return (
     <>
@@ -125,7 +180,7 @@ export default function ListLayoutWithCategories({
           </div>
           <div>
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-              {displayPosts.map((post, index) => {
+              {sortedDisplayPosts.map((post, index) => {
                 const { title, code, topics, href } = post
                 return (
                   <li key={index} className="py-5">
@@ -140,7 +195,7 @@ export default function ListLayoutWithCategories({
                             {topics?.map((topic) => <Category key={topic} topic={topic} category={category} />)}
                           </div>
                         </div>
-                        <RatingsAndComments slug={title} />
+                        <RatingsAndComments key={title} slug={title} total={post.rating_total} average={post.rating_average} count={post.rating_count} />
                         {href && (
                           <Link href={href} className="text-sm font-medium text-primary-400">
                             Learn More -&gt;
