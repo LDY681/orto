@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, doc, setDoc } from 'firebase/firestore'
 import { db } from 'app/firebase'
 import ReCAPTCHA from 'react-google-recaptcha'
 
@@ -130,11 +130,12 @@ const RatingModal = ({
     setIsSubmitting(true)
     setSubmitError(null)
     try {
-      await addDoc(collection(db, 'ratings'), {
+      const currDate = new Date()
+      const timestamp = currDate.toISOString()
+      await setDoc(doc(collection(db, 'ratings'), `${slug}-${answers['name']}-${answers['email']}-${timestamp}`), {
         title: slug,
         rating: selectedRating,
         // recaptchaToken: captchaToken,
-        comment: answers['comments'] || '',
         // for answers and input, store each entry as separate field in the document
         ...Object.fromEntries(Object.entries(answers).map(([key, value]) => [`${key}`, value])),
         createdAt: new Date(),

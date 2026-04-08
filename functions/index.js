@@ -13,9 +13,12 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const hbsModule = require("nodemailer-express-handlebars");
 const hbs = hbsModule.default || hbsModule;
-const {onDocumentCreated} = require("firebase-functions/v2/firestore");
+const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
+const {getFirestore} = require("firebase-admin/firestore");
 const crypto = require("crypto");
 
+// Project-specific constants
+const allowedOrigins = ["http://localhost:3000", "https://orto-blog.vercel.app"];
 const FUNCTION_REGION = "australia-southeast1";
 const PROJECT_ID = "orto-blog";
 
@@ -38,6 +41,7 @@ setGlobalOptions({
 });
 
 admin.initializeApp();
+const db = getFirestore();
 
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});
@@ -107,6 +111,76 @@ function verifyAndExtractId(token) {
   return Buffer.from(payload, "base64url").toString("utf8");
 }
 
+/* On rating updated (approved), update the rating average and counter
+ */
+exports.updateRating = onDocumentUpdated("ratings/{id}", async (event) => {
+  const evtSnapshot = event.data;
+  console.log("Rating document updated with ID: ", event.params.id, " data:", event.data);
+
+  if (!evtSnapshot) {
+    console.error("No snapshot found for event:", event);
+    return null;
+  }
+
+  // Find which title to update
+  const title = evtSnapshot.after.data().title;
+  if (!title) {
+    console.error("No title found in snapshot for event:", event);
+    return null;
+  }
+
+  // Find the document in rating_avg collection
+  const ratingsAvgRef = db.collection("ratings_avg");
+
+  // Find occurances in ratings collection
+  try {
+    const ratingsRef = db.collection("ratings").where("title", "==", title).where("status", "==", "approved");
+
+    const aggrQuery = ratingsRef.aggregate({
+      totalRating: admin.firestore.AggregateField.sum("rating"),
+      averageRating: admin.firestore.AggregateField.average("rating"),
+    });
+
+    const cntSnapshot = await ratingsRef.count().get();
+    const aggrSnapshot = await aggrQuery.get();
+    const snapshot = {
+      ...cntSnapshot.data(),
+      ...aggrSnapshot.data(),
+    };
+
+    return ratingsAvgRef.doc(title).set({
+      total: snapshot.totalRating,
+      average: snapshot.averageRating,
+      count: snapshot.count,
+    });
+  } catch (error) {
+    console.error("Error updating rating average for title:", title, "Error:", error);
+    return null;
+  }
+});
+
+/*
+ * Get ratings_avg for all titles
+ */
+exports.getRatingsAvg = https.onRequest({cors: allowedOrigins}, async (request, response) => {
+  try {
+    const ratingsAvgRef = db.collection("ratings_avg");
+    const snapshot = await ratingsAvgRef.get();
+    const ratingsAvg = {};
+    snapshot.forEach((doc) => {
+      ratingsAvg[doc.id] = doc.data();
+    });
+    // Set max-age cache for 1 hour
+    response.set("Cache-Control", "public, max-age=3600");
+    response.status(200).json({message: "Ratings fetched scuccessfully.", data: ratingsAvg});
+  } catch (error) {
+    console.error("Error fetching ratings average:", error);
+    response.status(500).json({message: "Internal server error."});
+  }
+});
+
+/* On new rating created, send email to admin for approval
+ */
 exports.sendEmail = onDocumentCreated("ratings/{id}", async (event) => {
   const id = event.params.id;
   const snapshot = event.data;
