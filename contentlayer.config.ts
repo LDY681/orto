@@ -172,6 +172,7 @@ export const Publication = defineDocumentType(() => ({
     draft: { type: 'boolean' },
     doi: { type: 'string' },
     pmid: { type: 'string' },
+    website: { type: 'string' },
   },
   computedFields: {
     code: { // expose code for rendering content in list layout

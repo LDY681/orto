@@ -36,7 +36,7 @@ const headerNavLinks = [
     href: '/people/member',
     title: 'People',
     hrefs: [
-      { title: 'Website Founders', href: '/people/member' },
+      { title: 'Current Members', href: '/people/member' },
       { title: 'Collaborators', href: '/people/collaborator' },
     ],
   },
