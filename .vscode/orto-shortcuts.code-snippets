@@ -41,6 +41,72 @@
 		],
 		"description": "Insert a link as [${2:Text}]",
 		"include": ["**/*.mdx"]
+	},
+	"Publication": {
+		"prefix": "pub",
+		"body": [
+			"---",
+			"authors: ''",
+			"date: ''",
+			"year: ",
+			"topics: ['','']",
+			"draft: true/false",
+			"doi: ''",
+			"pmid: ''",
+			"---",
+			"",
+			""
+		],
+		"description": "Insert a publication",
+		"include": ["**/*.mdx"]
+	},
+	"Resource": {
+		"prefix": "res",
+		"body": [
+			"---",
+			"title: ''",
+			"date: 'YYYY-MM-DD'",
+			"topics: ['','']",
+			"category: ''",
+			"draft: true/false",
+			"---",
+			"",
+			""
+		],
+		"description": "Insert a resource",
+		"include": ["**/*.mdx"]
+	},
+	"Author": {
+		"prefix": "aut",
+		"body": [
+			"---",
+			"name: ",
+			"avatar: /static/images/avatars/avatar_name.jpg",
+			"occupation: ",
+			"company: ",
+			"role: member/collaborator",
+			"---",
+			"",
+			""
+		],
+		"description": "Insert an author",
+		"include": ["**/*.mdx"]
+	},
+	"Blog": {
+		"prefix": "blog",
+		"body": [
+			"---",
+			"title: ",
+			"date: 'YYYY-MM-DD'",
+			"draft: true/false",
+			"layout: PostBanner/PostSimple/PostBanner",
+			"summary: ",
+			"---",
+			"",
+			""
+		],
+		"description": "Insert a blog post",
+		"include": ["**/*.mdx"]
 	}
 
 }
