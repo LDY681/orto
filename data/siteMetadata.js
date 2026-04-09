@@ -37,7 +37,7 @@ const siteMetadata = {
 
   analytics: {
     googleAnalytics: {
-      googleAnalyticsId: 'G-T93B9735NH', // e.g. G-XXXXXXX
+      googleAnalyticsId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID, // e.g. G-XXXXXXX
     },
   },
 
