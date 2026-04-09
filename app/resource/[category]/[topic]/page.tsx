@@ -6,7 +6,8 @@ import categoryData from 'app/category-data.json'
 import { genPageMetadata } from 'app/seo'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { sortPosts } from 'pliny/utils/contentlayer'
+// import { sortPosts } from 'pliny/utils/contentlayer'
+import { sortPostsOrderByKey } from 'app/utils'
 
 export async function generateMetadata(props: {
   params: Promise<{ category: string }>
@@ -34,7 +35,7 @@ export default async function CategoryPage(props: {
   // Capitalize first letter and convert space to dash
   const title = category[0].toUpperCase() + category.split(' ').join('-').slice(1)
 
-  const filteredPosts = sortPosts(
+  const filteredPosts = sortPostsOrderByKey(
     allResources.filter((post) => {
       if (post.category && post.topics) {
         const hypenatedCategory = post.category.split(' ').join('-').toLowerCase()
@@ -43,7 +44,7 @@ export default async function CategoryPage(props: {
       }
       return process.env.NODE_ENV !== 'production' || !post.draft
     })
-  )
+  , title, 'asc')
   if (filteredPosts.length === 0) {
     return notFound()
   }
