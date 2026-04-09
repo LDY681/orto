@@ -47,8 +47,8 @@
 		"body": [
 			"---",
 			"authors: ''",
-			"date: ''",
-			"year: ",
+			"date: 'YYYY-MM-DD'",
+			"year: YYYY",
 			"topics: ['','']",
 			"draft: true/false",
 			"doi: ''",
