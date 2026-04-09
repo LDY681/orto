@@ -121,7 +121,7 @@ export default function ListLayoutWithTopics({
           <div>
             <ul>
               {displayPosts.map((post) => {
-                const { authors, year, code, topics, doi, pmid } = post
+                const { authors, year, code, topics, doi, pmid, website } = post
                 return (
                   <li key={doi} className="py-5">
                     <article className="flex flex-col space-y-2 xl:space-y-0">
@@ -144,6 +144,11 @@ export default function ListLayoutWithTopics({
                           {pmid && (
                             <Button href={pmid} className="mr-3 text-sm font-medium uppercase">
                               PMID
+                            </Button>
+                          )}
+                          {website && (
+                            <Button href={website} className="mr-3 text-sm font-medium uppercase">
+                              WEBSITE
                             </Button>
                           )}
                         </div>
