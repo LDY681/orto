@@ -76,9 +76,13 @@ export default function ListLayoutWithCategories({
   pagination,
 }: ListLayoutProps) {
   const pathname = usePathname()
-  const categoryCounts = categoryData[category] as Record<string, number>
-  const categoryKeys = Object.keys(categoryCounts)
-  const sortedCategorys = categoryKeys.sort((a, b) => categoryCounts[b] - categoryCounts[a])
+  const topicCounts = categoryData[category] as Record<string, number>
+  const topicKeys = Object.keys(topicCounts)
+  let sortedTopics = topicKeys.sort((a, b) => topicCounts[b] - topicCounts[a])
+  // Put Our tools to the first topic if exists in a category
+  if (topicKeys.includes('our-tools')) {
+    sortedTopics = ['our-tools', ...sortedTopics.filter((t) => t !== 'our-tools')]
+  }
 
   const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts as Resource[]
   const [sortedDisplayPosts, setSortedDisplayPosts] = useState<Resource[]>([] as Resource[])
@@ -110,6 +114,9 @@ export default function ListLayoutWithCategories({
             rating_count: ratingData.count || 0,
           }
         })
+
+        //! Resource posts are supposed to be sorted by alaphetical order (so no additional rating sorting)
+        return setSortedDisplayPosts(postsWithRatings)
 
         const sortedPosts = [...postsWithRatings].sort((a, b) => {
           const ratingA = a.rating_average ?? 0
@@ -156,20 +163,20 @@ export default function ListLayoutWithCategories({
                 </Link>
               )}
               <ul>
-                {sortedCategorys.map((t) => {
+                {sortedTopics.map((t) => {
                   return (
                     <li key={t} className="my-3">
                       {decodeURI(pathname.split(`/resource/${category}/`)[1]) === slug(t) ? (
                         <h3 className="inline px-3 py-2 text-sm font-bold uppercase text-primary-500">
-                          {`${t} (${categoryCounts[t]})`}
+                          {`${t} (${topicCounts[t]})`}
                         </h3>
                       ) : (
                         <Link
                           href={`/resource/${category}/${slug(t)}`}
-                          className="px-3 py-2 text-sm font-medium uppercase text-gray-500 hover:text-primary-500 dark:text-gray-300 dark:hover:text-primary-500"
+                          className={`px-3 py-2 text-sm font-medium uppercase ${t == 'our-tools' ? 'text-secondary-400 dark:text-secondary-300 hover:text-secondary-500 dark:hover:text-secondary-500' : 'text-gray-500 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500'}`}
                           aria-label={`View posts categorized ${t}`}
                         >
-                          {`${t} (${categoryCounts[t]})`}
+                          {`${t} (${topicCounts[t]})`}
                         </Link>
                       )}
                     </li>

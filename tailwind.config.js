@@ -26,6 +26,7 @@ module.exports = {
       },
       colors: {
         primary: colors.sky,
+        secondary: colors.yellow,
         gray: colors.gray,
       },
       zIndex: {
