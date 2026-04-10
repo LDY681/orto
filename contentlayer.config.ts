@@ -133,13 +133,13 @@ export const Blog = defineDocumentType(() => ({
     date: { type: 'date', required: true },
     tags: { type: 'list', of: { type: 'string' }, default: [] },
     lastmod: { type: 'date' },
-    draft: { type: 'boolean' },
     summary: { type: 'string' },
     images: { type: 'json' },
     authors: { type: 'list', of: { type: 'string' } },
     layout: { type: 'string' },
     bibliography: { type: 'string' },
     canonicalUrl: { type: 'string' },
+    draft: { type: 'boolean', default: false },
   },
   computedFields: {
     ...computedFields,
@@ -167,11 +167,11 @@ export const Publication = defineDocumentType(() => ({
   fields: {
     authors: { type: 'string', required: true },
     year: { type: 'number', required: true },
-    topics: { type: 'list', of: { type: 'string' }, default: [] },
-    draft: { type: 'boolean' },
+    topics: { type: 'list', of: { type: 'string' }, required: true },
     doi: { type: 'string' },
     pmid: { type: 'string' },
     website: { type: 'string' },
+    draft: { type: 'boolean', default: false },
   },
   computedFields: {
     code: { // expose code for rendering content in list layout
@@ -188,11 +188,10 @@ export const Resource = defineDocumentType(() => ({
   contentType: 'mdx',
   fields: {
     title: { type: 'string', required: true },
-    date: { type: 'date', required: true },
     topics: { type: 'list', of: { type: 'string' }, required: true },
     category: { type: 'string', required: true },
     href: { type: 'string' },
-    draft: { type: 'boolean' },
+    draft: { type: 'boolean', default: false },
   },
   computedFields: {
     code: { // expose code for rendering content in list layout
