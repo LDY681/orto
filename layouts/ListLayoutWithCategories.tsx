@@ -11,8 +11,6 @@ import categoryData from 'app/category-data.json'
 import { MDXLayoutRenderer } from 'pliny/mdx-components'
 import Category from '@/components/Category'
 import RatingsAndComments from '@/components/RatingsAndComments'
-import { httpsCallable } from 'firebase/functions'
-import { functions } from 'app/firebase'
 
 interface PaginationProps {
   totalPages: number
@@ -85,7 +83,7 @@ export default function ListLayoutWithCategories({
   }
 
   const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts as Resource[]
-  const [sortedDisplayPosts, setSortedDisplayPosts] = useState<Resource[]>([] as Resource[])
+  const [ratedDisplayPosts, setRatedDisplayPosts] = useState<Resource[]>([] as Resource[])
 
   useEffect(() => {
     const fetchAndSortPosts = async () => {
@@ -115,26 +113,10 @@ export default function ListLayoutWithCategories({
           }
         })
 
-        //! Resource posts are supposed to be sorted by alaphetical order (so no additional rating sorting)
-        return setSortedDisplayPosts(postsWithRatings)
-
-        const sortedPosts = [...postsWithRatings].sort((a, b) => {
-          const ratingA = a.rating_average ?? 0
-          const ratingB = b.rating_average ?? 0
-          const countA = a.rating_count ?? 0
-          const countB = b.rating_count ?? 0
-
-          // Rating by average then by count
-          if (ratingB === ratingA) {
-            return countB - countA
-          }
-          return ratingB - ratingA
-        })
-
-        setSortedDisplayPosts(sortedPosts)
+        return setRatedDisplayPosts(postsWithRatings)
       } catch (error) {
         console.error('Error fetching ratings:', error)
-        setSortedDisplayPosts(displayPosts)
+        setRatedDisplayPosts(displayPosts)
       }
     }
     fetchAndSortPosts()
@@ -187,7 +169,7 @@ export default function ListLayoutWithCategories({
           </div>
           <div>
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-              {sortedDisplayPosts.map((post, index) => {
+              {ratedDisplayPosts.map((post, index) => {
                 const { title, code, topics, href } = post
                 return (
                   <li key={index} className="py-5">
