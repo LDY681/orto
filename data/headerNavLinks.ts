@@ -31,6 +31,7 @@ const headerNavLinks = [
       },
     ],
   },
+  { href: '/octava', title: 'OCTAVA' },
   { href: '/contact', title: 'Contact' },
   {
     href: '/people/member',
