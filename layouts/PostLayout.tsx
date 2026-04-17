@@ -26,6 +26,7 @@ interface LayoutProps {
   content: CoreContent<Blog>
   authorDetails: CoreContent<Authors>[]
   showComments?: boolean
+  showFooter?: boolean
   next?: { path: string; title: string }
   prev?: { path: string; title: string }
   children: ReactNode
@@ -35,6 +36,7 @@ export default function PostLayout({
   content,
   authorDetails,
   showComments = true,
+  showFooter = false,
   next,
   prev,
   children,
@@ -83,16 +85,14 @@ export default function PostLayout({
                       <dl className="whitespace-nowrap text-sm font-medium leading-5">
                         <dt className="sr-only">Name</dt>
                         <dd className="text-gray-900 dark:text-gray-100">{author.name}</dd>
-                        <dt className="sr-only">Twitter</dt>
+                        <dt className="sr-only">Email</dt>
                         <dd>
-                          {author.twitter && (
+                          {author.email && (
                             <Link
-                              href={author.twitter}
+                              href={`mailto:${author.email}`}
                               className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
                             >
-                              {author.twitter
-                                .replace('https://twitter.com/', '@')
-                                .replace('https://x.com/', '@')}
+                              {author.email}
                             </Link>
                           )}
                         </dd>
@@ -121,55 +121,57 @@ export default function PostLayout({
                 </div>
               )}
             </div>
-            <footer>
-              <div className="divide-gray-200 text-sm font-medium leading-5 dark:divide-gray-700 xl:col-start-1 xl:row-start-2 xl:divide-y">
-                {tags && (
-                  <div className="py-4 xl:py-8">
-                    <h2 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                      Tags
-                    </h2>
-                    <div className="flex flex-wrap">
-                      {tags.map((tag) => (
-                        <Tag key={tag} text={tag} />
-                      ))}
+            {showFooter &&(
+              <footer>
+                <div className="divide-gray-200 text-sm font-medium leading-5 dark:divide-gray-700 xl:col-start-1 xl:row-start-2 xl:divide-y">
+                  {tags && tags.length > 0 && (
+                    <div className="py-4 xl:py-8">
+                      <h2 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        Tags
+                      </h2>
+                      <div className="flex flex-wrap">
+                        {tags.map((tag) => (
+                          <Tag key={tag} text={tag} />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-                {(next || prev) && (
-                  <div className="flex justify-between py-4 xl:block xl:space-y-8 xl:py-8">
-                    {prev && prev.path && (
-                      <div>
-                        <h2 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                          Previous Article
-                        </h2>
-                        <div className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400">
-                          <Link href={`/${prev.path}`}>{prev.title}</Link>
+                  )}
+                  {(next || prev) && (
+                    <div className="flex justify-between py-4 xl:block xl:space-y-8 xl:py-8">
+                      {prev && prev.path && (
+                        <div>
+                          <h2 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                            Previous Article
+                          </h2>
+                          <div className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400">
+                            <Link href={`/${prev.path}`}>{prev.title}</Link>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {next && next.path && (
-                      <div>
-                        <h2 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                          Next Article
-                        </h2>
-                        <div className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400">
-                          <Link href={`/${next.path}`}>{next.title}</Link>
+                      )}
+                      {next && next.path && (
+                        <div>
+                          <h2 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                            Next Article
+                          </h2>
+                          <div className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400">
+                            <Link href={`/${next.path}`}>{next.title}</Link>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="pt-4 xl:pt-8">
-                <Link
-                  href={`/${basePath}`}
-                  className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
-                  aria-label="Back to the blog"
-                >
-                  &larr; Back to the blog
-                </Link>
-              </div>
-            </footer>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="pt-4 xl:pt-8">
+                  <Link
+                    href={`/${basePath}`}
+                    className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
+                    aria-label="Back to the blog"
+                  >
+                    &larr; Back to the blog
+                  </Link>
+                </div>
+              </footer>
+            )}
           </div>
         </div>
       </article>

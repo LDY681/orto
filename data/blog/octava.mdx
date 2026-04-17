@@ -1,8 +1,100 @@
 ---
-title: OCTAVA
-date: '2024-11-14'
+title: OCTAVA 3.0
+date: '2026-05-01'
+authors: ['Danuta Sampson', 'Gavrielle Untracht']
 draft: false
-layout: PostBanner
-images: ['/static/images/about.jpg']
-summary: OCTAVA software.
+layout: PostLayout
+summary: OCTAVA is an open-source software designed for the automated extraction and quantitative analysis of OCTA-derived microvascular metrics from en-face images downloaded from the OCTA camera. OCTAVA provides a user-friendly graphical interface that facilitates detailed, non-invasive analysis of retinal, optic nerve head, and skin blood vessels, which is crucial for studying and diagnosing vascular diseases. The software does not provide automated image quality assessment; users are therefore responsible for evaluating image quality independently.
 ---
+
+# OCTAVA – Optical Coherence Tomography Angiography Vascular Analyser 
+**OCTAVA** is an open-source software designed for the automated extraction and quantitative analysis of OCTA-derived microvascular metrics from en-face images downloaded from the OCTA camera. OCTAVA provides a user-friendly graphical interface that facilitates detailed, non-invasive analysis of retinal, optic nerve head, and skin blood vessels, which is crucial for studying and diagnosing vascular diseases. The software does not provide automated image quality assessment; users are therefore responsible for evaluating image quality independently.
+
+> When using OCTAVA, cite the following peer-reviewed articles:
+
+```
+Untracht, G. R., Durkee, M. S., Zhao, M., Kwok-Cheung Lam, A., Sikorski, B. L., Sarunic, M. V., Andersen, P. E., Sampson, D. D., Chen, F. K., & Sampson, D. M. (2024).
+Towards standardising retinal OCT angiography image analysis with open-source toolbox OCTAVA. Scientific reports, 14(1), 5979.
+https://doi.org/10.1038/s41598-024-53501-6  
+```  
+
+```
+Untracht, G. R., Matos, R. S., Dikaios, N., Bapir, M., Durrani, A. K., Butsabong, T., Campagnolo, P., Sampson, D. D., Heiss, C., & Sampson, D. M. (2021).
+OCTAVA: An open-source toolbox for quantitative analysis of optical coherence tomography angiography images. PloS one, 16(12), e0261052.
+https://doi.org/10.1371/journal.pone.0261052 
+```
+<br/>
+# How to Use OCTAVA
+OCTAVA Graphical User Interface (GUI) is an intuitive interface featuring buttons, dropdown menus, and real-time visualisation panels for seamless user interaction.
+
+~~TODO PICTURE and DESCRIPTION HERE~~
+<Image src="/static/images/test-illustration.png" alt="test illustration" width={800} height={400} />
+
+The user first selects the image type for analysis: Retina, optic nerve head (ONH), or skin and insert image size The image is then processed with a series of image-processing techniques to generate OCTA microvascular metrics and, where applicable, foveal avascular zone metrics.
+
+First, vessels in the image are segmented using filtering and binarisation techniques. Filtering enhances vessel visibility while reducing noise, improving overall image quality. The binarisation step then classifies pixels, assigning white to vessel structures and black to background noise. In the current version of OCTAVA, we use ……
+
+~~Raw Image, Binarised Image and Skeletonised Image Figure Panel Here~~
+<Image src="/static/images/test-illustration.png" alt="test illustration" width={800} height={400} />
+
+OCTAVA supports both single- and batch-processing, enhancing its utility for handling large-scale studies.
+
+<br/>
+# OCTAVA OUTPUT
+## OCTA-derived Microvascular Metrics
+OCTAVA can calculate multiple OCTA-derived metrics, summarised in the table below. The metrics are saved in an Excel file to facilitate easy compilation of data from multiple subjects. When batch processing is selected, multiple input images can be analysed automatically. For each image, a separate output folder is created to store the corresponding results. Additionally, a summary Excel file is generated that consolidates the output data from all processed images.
+<span className="text-red-500">For sub-region analysis, if the analysed image is de-centred and the sector is lacking more than 20% of the defined sub-region, the metrics for that sector are marked as NA.</span>
+
+| Metric (abbreviation) | Unit  | Analysed image | Description and importance | Illustration |
+| :-------- | :---- | :------ | :------------ | :------ |
+Vessel area density (VAD)	| *%*	| Binarised	| Perfused blood vessel area (white pixels) in the binarised OCTA MIP image divided by total image area (all pixels) multiplied by 100. Can be used to demonstrate ischemia. | <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+Vessel length density (VLD) |	*%* |	Skeletonised	| Total vessel length multiplied by the width of one pixel (i.e., total area of skeletonised vessels) divided by the total image area and multiplied by 100. Length measurements are calculated from the skeletonised OCTA MIP image. More sensitive than VAD to perfusion changes at the capillary level.	| <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+Mean, median, and distribution of vessel diameter	| $$μm$$	| Binarised |	Mean, median, and distribution of diameter measurements are acquired using a Euclidian distance transform applied to the binarised OCTA MIP. The mean (median) diameter is the mean (median) for a single vessel, including one value for each identified segment. Can inform on dilation, sprouting, or vessel regression.	| <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+Total, mean, median, and distribution of vessel length (VL)	| $$μm$$	| Skeletonised	| Total, mean, median, and distribution of the single-vessel centreline lengths including one value for each identified segment measured from the skeletonised image. Network interconnectivity and branching patterns can indicate oxygenation/nutrient delivery dysfunction. 	| <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+Branchpoint density (BD)	| $$nodes/mm$$	| Skeletonised	| Number of identified nodes divided by total vessel length. May indicate resilience to occlusion or blockage of blood flow. | <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} /> 	
+Mean (MeanT) and distribution of vessel tortuosity	| *1*	| Skeletonised	| Tortuosity is calculated from the arc length-over-chord ratio. Can inform on pathological microvascular remodelling and/or ischemia. | <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />	
+Fractal dimension ($D_F$)	| *1*	| Binarised	| Indication of how the network fills space on variable length scales, calculated using the box counting method. FD is commonly reported as $$FD ± FD_{error}$$. Altered spatial distribution of the capillary network is an indicator of impairment of oxygenation and nutrient delivery.| <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />	
+Foveal avascular zone area (FAZA)	| $$mm^2$$	| Binarised	| Total area of black pixels enclosed by the FAZ segmentation contour. Changes in the FAZA can be indicative of macular oedema or ischemia and changes in retinal thickness. | <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} /> 
+FAZ perimeter	| $$mm$$	| Binarised	| Length of the perimeter of the FAZ segmentation contour. It provides an additional metric about the change in FAZA. | <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+FAZ axis ratio	| *1*	| Binarised	| Ratio between the major and minor axis of the ellipsoidal best fit to FAZ outline shape. Elongation of the FAZA can be indicative of changes in retinal thickness. | <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+FAZ circularity	| *1*	| Binarised	| FAZ area multiplied by 4π divided by FAZ perimeter squared. Indicates elongation of the FAZ, which can be indicative of changes in retinal thickness.	| <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+FAZ acircularity index	| *1*	| Binarised	| Ratio between the measured perimeter and the perimeter of a circular area of the same size. Indication of elongation of the FAZ. | <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+Foveal avascular density 300 (FD-300)	| *%*	| Binarised	| Percentage of the area occupied by vessels (white pixels) divided by the area in a 300-μm width rim surrounding the FAZ. This rim width value was originally chosen based on the relationship between FAZ and ganglion cell complex thickness in normal eyes to better distinguish between normal variations in FAZ and those due to pathology.	| <ThumbNail src="/static/images/test-illustration.png" alt="test illustration" width={200} height={200} />
+
+
+ 
+<br/>
+# SOFTWARE AVAILABILITY and INSTALLATION
+MATLAB source code: ~~TODO~~  
+Python source code: ~~TODO~~  
+PC Stand-alone version: ~~TODO~~  
+Mac Stand-alone version: ~~TODO~~   
+Dataset with OCTAVA-generated output for testing: ~~TODO~~  
+
+<br/>
+# AUTHORS:
+The following individuals made substantial intellectual contributions to the design, implementation, and maintenance of the OCTAVA 3.0 software and take responsibility for its content:  
+-	**Danuta Sampson** (Lions Eye Institute)
+-	**Mila Zhang** (Lions Eye Institute)
+-	**Dayu Liu** (Lions Eye Institute)
+-	**Gavrielle Untracht** (Technical University of Denmark)
+-	**Madeleine Torcasso** (University of Chicago)
+
+#  CONTRIBUTORS:  
+We gratefully acknowledge the following individuals for their contributions to this project, including code translation and advancement, testing, debugging, and discussions:
+-	**Martin Utrera** (University of Chicago); partial code translation and extensions
+-	**Jiashuai Chai** (Lions Eye Institute); partial code translation and extensions
+-	**Laurel Chow** (University of Western Australia); partial code translation and extensions
+-	**Ishita Sharma** (Lions Eye Institute); partial code translation and extensions
+-	**Simon Hoffman** (Karlsruhe Institute of Technology); discussions; documentation feedback
+-	**Ondine Gordon** (Western Australia; consumer feedback); discussions; documentation feedback
+-	**Tim Benson** (Western Australia; consumer feedback); discussions; documentation feedback
+
+# CONTRIBUTION TAXONOMY:
+**Conceptualisation**: Sampson, Untracht & Torcasso  
+**Software architecture**: Zhang and Untracht  
+**Core implementation**: Binarisation (Zhang), Skeletonisation (Utrera & Chai), FAZ segmentation (Chow and Liu); ONH Module (Chai)  
+**Validation and testing**: Sampson & Zhang  
+**Documentation**: Sampson, Zhang, Untracht & Torcasso  
+**Consumer feedback**: Hoffmann, Gordon & Benson  
+**Supervision**: Sampson  
