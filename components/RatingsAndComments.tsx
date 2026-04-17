@@ -46,7 +46,7 @@ export default function RatingsAndComments({ slug, total = 0, average = 0, count
           </a>
         )}
       </div>
-      {loadComments && (
+      {siteMetadata?.comments?.provider && loadComments && (
         <CommentsComponent commentsConfig={siteMetadata.comments} slug={slug} />
       )}
     </>

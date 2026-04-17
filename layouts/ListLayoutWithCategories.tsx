@@ -25,6 +25,12 @@ interface ListLayoutProps {
   pagination?: PaginationProps
 }
 
+interface PostWithRating extends Resource {
+  rating_total: number
+  rating_average: number
+  rating_count: number
+}
+
 function Pagination({ totalPages, currentPage }: PaginationProps) {
   const pathname = usePathname()
   const basePath = pathname.split('/')[1]
@@ -83,7 +89,7 @@ export default function ListLayoutWithCategories({
   }
 
   const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts as Resource[]
-  const [ratedDisplayPosts, setRatedDisplayPosts] = useState<Resource[]>([] as Resource[])
+  const [ratedDisplayPosts, setRatedDisplayPosts] = useState<PostWithRating[]>([] as PostWithRating[])
 
   useEffect(() => {
     const fetchAndSortPosts = async () => {
@@ -116,7 +122,7 @@ export default function ListLayoutWithCategories({
         return setRatedDisplayPosts(postsWithRatings)
       } catch (error) {
         console.error('Error fetching ratings:', error)
-        setRatedDisplayPosts(displayPosts)
+        setRatedDisplayPosts(displayPosts as PostWithRating[])
       }
     }
     fetchAndSortPosts()

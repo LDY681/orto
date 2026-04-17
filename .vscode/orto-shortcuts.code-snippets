@@ -69,7 +69,7 @@
 			"---",
 			"title: ",
 			"date: 'YYYY-MM-DD'",
-			"layout: PostBanner/PostSimple/PostBanner",
+			"layout: PostBanner/PostSimple/PostLayout",
 			"summary: ",
 			"draft: false",
 			"---",
