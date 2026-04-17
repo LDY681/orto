@@ -49,3 +49,12 @@ export function sortPostsByYearAndTitle<T extends MDXDocument>(allBlogs: T[], or
     return sortOrderBy(keyA, keyB, order);
   });
 }
+
+/**
+ * Filter and show blog posts only (excluding first-level pages in post layouts)
+ */
+
+export function filterBlogs<T extends MDXDocument>(allBlogs: T[]): T[] {
+  const excludedSlugs = ['about', 'octava'];
+  return allBlogs.filter((post) => !excludedSlugs.includes(post.slug));
+}

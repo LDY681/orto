@@ -1,5 +1,4 @@
 import ListLayout from '@/layouts/ListLayoutWithTopics'
-import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
 import { allPublications } from 'contentlayer/generated'
 import { genPageMetadata } from 'app/seo'
 import { sortPostsByYearAndTitle} from 'app/utils'
