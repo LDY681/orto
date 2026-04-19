@@ -88,23 +88,27 @@ export default function ListLayoutWithCategories({
     sortedTopics = ['our-tools', ...sortedTopics.filter((t) => t !== 'our-tools')]
   }
 
-  const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts as Resource[]
-  const [ratedDisplayPosts, setRatedDisplayPosts] = useState<PostWithRating[]>([] as PostWithRating[])
+  const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : (posts as Resource[])
+  const [ratedDisplayPosts, setRatedDisplayPosts] = useState<PostWithRating[]>(
+    [] as PostWithRating[]
+  )
 
   useEffect(() => {
     const fetchAndSortPosts = async () => {
       try {
         //! Use fetch instead of firebase.httpsCallable as its post only and cant do caching
         // Project-specific constants
-        const FUNCTION_REGION = "australia-southeast1";
-        const PROJECT_ID = "orto-blog";
-        const ratingResponse = await fetch(`https://${FUNCTION_REGION}-${PROJECT_ID}.cloudfunctions.net/getRatingsAvg`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        .then(res => res.json())
+        const FUNCTION_REGION = 'australia-southeast1'
+        const PROJECT_ID = 'orto-blog'
+        const ratingResponse = await fetch(
+          `https://${FUNCTION_REGION}-${PROJECT_ID}.cloudfunctions.net/getRatingsAvg`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        ).then((res) => res.json())
 
         const ratingsResult = ratingResponse.data ?? {}
 
@@ -161,7 +165,7 @@ export default function ListLayoutWithCategories({
                       ) : (
                         <Link
                           href={`/resource/${category}/${slug(t)}`}
-                          className={`px-3 py-2 text-sm font-medium uppercase ${t == 'our-tools' ? 'text-secondary-400 dark:text-secondary-300 hover:text-secondary-500 dark:hover:text-secondary-500' : 'text-gray-500 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500'}`}
+                          className={`px-3 py-2 text-sm font-medium uppercase ${t == 'our-tools' ? 'text-secondary-400 hover:text-secondary-500 dark:text-secondary-300 dark:hover:text-secondary-500' : 'text-gray-500 hover:text-primary-500 dark:text-gray-300 dark:hover:text-primary-500'}`}
                           aria-label={`View posts categorized ${t}`}
                         >
                           {`${t} (${topicCounts[t]})`}
@@ -187,10 +191,18 @@ export default function ListLayoutWithCategories({
                           </div>
                           <MDXLayoutRenderer code={code} />
                           <div className="flex flex-wrap">
-                            {topics?.map((topic) => <Category key={topic} topic={topic} category={category} />)}
+                            {topics?.map((topic) => (
+                              <Category key={topic} topic={topic} category={category} />
+                            ))}
                           </div>
                         </div>
-                        <RatingsAndComments key={title} slug={title} total={post.rating_total} average={post.rating_average} count={post.rating_count} />
+                        <RatingsAndComments
+                          key={title}
+                          slug={title}
+                          total={post.rating_total}
+                          average={post.rating_average}
+                          count={post.rating_count}
+                        />
                         {href && (
                           <Link href={href} className="text-sm font-medium text-primary-400">
                             Learn More -&gt;

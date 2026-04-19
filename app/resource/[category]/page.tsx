@@ -40,8 +40,10 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
         return hypenatedCategory == category
       }
       return process.env.NODE_ENV !== 'production' || !post.draft
-    })
-  , 'title', 'asc')
+    }),
+    'title',
+    'asc'
+  )
 
   if (filteredPosts.length === 0) {
     return notFound()

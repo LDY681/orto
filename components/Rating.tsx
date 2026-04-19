@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import type { MouseEvent, PointerEvent } from 'react'
+import type { KeyboardEvent, MouseEvent, PointerEvent } from 'react'
 import RatingModal from './RatingModal'
 
 interface RatingProps {
@@ -49,20 +49,32 @@ const STAR_OUTLINED = (
   </svg>
 )
 
-const STAR_HALVED = (<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="green" strokeWidth="1" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="halfFill" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="50%" stopColor="orange" />
-      <stop offset="50%" stopColor="transparent" />
-    </linearGradient>
-  </defs>
-  
-  <path d="M10 1l2.5 5.5h6l-4.5 4 1.5 6-5.5-3.5-5.5 3.5 1.5-6-4.5-4h6z" 
-        fill="url(#halfFill)" 
-        stroke="orange" 
-        strokeWidth="1" 
-        strokeLinejoin="round"/>
-</svg>)
+const STAR_HALVED = (
+  <svg
+    viewBox="0 0 20 20"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="green"
+    strokeWidth="1"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <linearGradient id="halfFill" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="50%" stopColor="orange" />
+        <stop offset="50%" stopColor="transparent" />
+      </linearGradient>
+    </defs>
+
+    <path
+      d="M10 1l2.5 5.5h6l-4.5 4 1.5 6-5.5-3.5-5.5 3.5 1.5-6-4.5-4h6z"
+      fill="url(#halfFill)"
+      stroke="orange"
+      strokeWidth="1"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
 
 function clampRating(value: number) {
   return Math.min(5, Math.max(0.5, value))
@@ -109,11 +121,36 @@ const Rating = ({ average, count, slug }: RatingProps) => {
     setHoverRating(average)
   }
 
-  const handleClick = async (event: MouseEvent<HTMLDivElement>) => {
+  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     const value = getPointerRating(event.clientX)
     if (value !== null) {
       setHoverRating(value)
       openRatingModal(slug, value)
+    }
+  }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const current = displayRating || 0.5
+    let nextRating: number | null = null
+
+    switch (event.key) {
+      case 'ArrowRight':
+        nextRating = current + 0.5
+        break
+      case 'ArrowLeft':
+        nextRating = current - 0.5
+        break
+      case 'Enter':
+        event.preventDefault()
+        openRatingModal(slug, clampRating(roundToHalf(current)))
+        return
+      default:
+        return
+    }
+
+    event.preventDefault()
+    if (nextRating !== null) {
+      setHoverRating(clampRating(roundToHalf(nextRating)))
     }
   }
 
@@ -127,21 +164,36 @@ const Rating = ({ average, count, slug }: RatingProps) => {
     <div className="flex">
       <div
         ref={starsRef}
-        className="flex items-center cursor-pointer"
+        className="flex cursor-pointer items-center"
         aria-label="Rating"
+        role="slider"
+        aria-valuemin={0.5}
+        aria-valuemax={5}
+        aria-valuenow={displayRating}
+        aria-valuetext={`${displayRating.toFixed(1)} out of 5`}
         tabIndex={0}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
       >
         {[...Array(5)].map((_, index) => (
           <span key={index}>
-            {index < Math.floor(displayRating) ? STAR_FILLED : index < displayRating ? STAR_HALVED : STAR_OUTLINED}
-          </span> 
+            {index < Math.floor(displayRating)
+              ? STAR_FILLED
+              : index < displayRating
+                ? STAR_HALVED
+                : STAR_OUTLINED}
+          </span>
         ))}
       </div>
       <span className="ml-2 text-sm text-gray-500">{ratingSummary}</span>
-      <RatingModal isOpen={isModalOpen} selectedRating={selectedRating} slug={slug} onClose={() => setIsModalOpen(false)} />
+      <RatingModal
+        isOpen={isModalOpen}
+        selectedRating={selectedRating}
+        slug={slug}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   )
 }

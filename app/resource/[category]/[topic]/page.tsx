@@ -39,12 +39,18 @@ export default async function CategoryPage(props: {
     allResources.filter((post) => {
       if (post.category && post.topics) {
         const hypenatedCategory = post.category.split(' ').join('-').toLowerCase()
-        const hypenatedTopic = post.topics.find((t) => t === topic || slug(t) === topic)?.split(' ').join('-').toLowerCase()
+        const hypenatedTopic = post.topics
+          .find((t) => t === topic || slug(t) === topic)
+          ?.split(' ')
+          .join('-')
+          .toLowerCase()
         return hypenatedCategory == category && hypenatedTopic == topic
       }
       return process.env.NODE_ENV !== 'production' || !post.draft
-    })
-  , title, 'asc')
+    }),
+    title,
+    'asc'
+  )
   if (filteredPosts.length === 0) {
     return notFound()
   }

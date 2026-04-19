@@ -121,7 +121,7 @@ export default function PostLayout({
                 </div>
               )}
             </div>
-            {showFooter &&(
+            {showFooter && (
               <footer>
                 <div className="divide-gray-200 text-sm font-medium leading-5 dark:divide-gray-700 xl:col-start-1 xl:row-start-2 xl:divide-y">
                   {tags && tags.length > 0 && (

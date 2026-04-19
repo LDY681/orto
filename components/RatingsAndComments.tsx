@@ -21,21 +21,30 @@ const changeTitle = (slug: string) => {
 }
 
 interface RatingsAndCommentsProps {
-  slug: string,
-  total?: number,
-  average?: number,
+  slug: string
+  total?: number
+  average?: number
   count?: number
 }
-export default function RatingsAndComments({ slug, total = 0, average = 0, count = 0 }: RatingsAndCommentsProps) {
+export default function RatingsAndComments({
+  slug,
+  total = 0,
+  average = 0,
+  count = 0,
+}: RatingsAndCommentsProps) {
   const [loadComments, setLoadComments] = useState(false)
 
   return (
     <>
-      <div className="flex justify-start items-center gap-2">
+      <div className="flex items-center justify-start gap-2">
         <Rating average={average} count={count} slug={slug} />
         {/* ! Temporary disabled, see siteMetadata */}
-        { siteMetadata?.comments?.provider && (
-          <a className='flex flex-1 justify-end pr-2' href={`#${slug}`} onClick={() => changeTitle(slug)}>
+        {siteMetadata?.comments?.provider && (
+          <a
+            className="flex flex-1 justify-end pr-2"
+            href={`#${slug}`}
+            onClick={() => changeTitle(slug)}
+          >
             <button
               aria-label="Scroll To Comment"
               onClick={() => setLoadComments(!loadComments)}

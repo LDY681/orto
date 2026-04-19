@@ -132,7 +132,9 @@ export default function ListLayoutWithTopics({
                           </div>
                           <MDXLayoutRenderer code={code} />
                           <div className="flex flex-wrap">
-                            {topics?.map((topic) => <Topic key={topic} text={topic} />)}
+                            {topics?.map((topic) => (
+                              <Topic key={topic} text={topic} />
+                            ))}
                           </div>
                         </div>
                         <div className="flex flex-wrap">

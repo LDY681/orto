@@ -1,7 +1,7 @@
 import ListLayout from '@/layouts/ListLayoutWithTopics'
 import { allPublications } from 'contentlayer/generated'
 import { genPageMetadata } from 'app/seo'
-import { sortPostsByYearAndTitle} from 'app/utils'
+import { sortPostsByYearAndTitle } from 'app/utils'
 const POSTS_PER_PAGE = 100 // default
 
 export const metadata = genPageMetadata({ title: 'Publication' })
