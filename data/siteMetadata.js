@@ -31,8 +31,7 @@ const siteMetadata = {
 
   //! TODO currently trusted domains disabled for testing, re-enable after ready for production
   recaptcha: {
-    siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
-    secretKey: process.env.NEXT_PUBLIC_RECAPTCHA_SECRET_KEY,
+    siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
   },
 
   analytics: {
