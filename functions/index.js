@@ -18,8 +18,11 @@ const {getFirestore} = require("firebase-admin/firestore");
 const crypto = require("crypto");
 
 // Project-specific constants
-/* eslint-disable no-useless-escape */
-const allowedOrigins = ["http://localhost:3000", "https://orto-blog.vercel.app", "https:\/\/.*-open-research-tools-for-ophthalms-projects\.vercel\.app.*$"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://orto-blog.vercel.app",
+  /^https:\/\/.*-open-research-tools-for-ophthalms-projects\.vercel\.app$/,
+];
 const FUNCTION_REGION = "australia-southeast1";
 const PROJECT_ID = "orto-blog";
 
