@@ -70,7 +70,11 @@ export default function ListLayoutWithTopics({
   const pathname = usePathname()
   const topicCounts = topicData as Record<string, number>
   const topicKeys = Object.keys(topicCounts)
-  const sortedTopics = topicKeys.sort((a, b) => topicCounts[b] - topicCounts[a])
+  let sortedTopics = topicKeys.sort((a, b) => topicCounts[b] - topicCounts[a])
+  // Put Our papers to the first topic if exists in a category
+  if (topicKeys.includes('our-papers')) {
+    sortedTopics = ['our-papers', ...sortedTopics.filter((t) => t !== 'our-papers')]
+  }
 
   const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts
 
@@ -106,7 +110,7 @@ export default function ListLayoutWithTopics({
                       ) : (
                         <Link
                           href={`/topics/${slug(t)}`}
-                          className="px-3 py-2 text-sm font-medium uppercase text-gray-500 hover:text-primary-500 dark:text-gray-300 dark:hover:text-primary-500"
+                          className={`px-3 py-2 text-sm font-medium uppercase ${t == 'our-papers' ? 'text-secondary-400 hover:text-secondary-500 dark:text-secondary-300 dark:hover:text-secondary-500' : 'text-gray-500 hover:text-primary-500 dark:text-gray-300 dark:hover:text-primary-500'}`}
                           aria-label={`View posts topicged ${t}`}
                         >
                           {`${t} (${topicCounts[t]})`}
@@ -133,7 +137,7 @@ export default function ListLayoutWithTopics({
                           <MDXLayoutRenderer code={code} />
                           <div className="flex flex-wrap">
                             {topics?.map((topic) => (
-                              <Topic key={topic} text={topic} />
+                              <Topic key={topic} topic={topic} />
                             ))}
                           </div>
                         </div>
