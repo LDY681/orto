@@ -54,6 +54,9 @@ module.exports = {
             code: {
               color: theme('colors.indigo.500'),
             },
+            // Remove backticks from inline code
+            'blockquote p::before': { content: 'none' },
+            'blockquote p::after': { content: 'none' },
           },
         },
         invert: {
