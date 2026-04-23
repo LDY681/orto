@@ -22,10 +22,14 @@ export default async function Page() {
           {topicKeys.length === 0 && 'No topics found.'}
           {sortedTopics.map((t) => {
             return (
-              <div key={t} className={`mb-2 mr-5 mt-2
-                  ${t == 'our-papers' ? 
-                    'text-secondary-400 hover:text-secondary-500 dark:text-secondary-300 dark:hover:text-secondary-500'
-                    : 'text-primary-500 hover:text-primary-600 dark:hover:text-primary-400'}
+              <div
+                key={t}
+                className={`mb-2 mr-5 mt-2
+                  ${
+                    t == 'our-papers'
+                      ? 'text-secondary-400 hover:text-secondary-500 dark:text-secondary-300 dark:hover:text-secondary-500'
+                      : 'text-primary-500 hover:text-primary-600 dark:hover:text-primary-400'
+                  }
                 `}
               >
                 <Topic key={t} topic={t} />
