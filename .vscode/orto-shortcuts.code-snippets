@@ -20,11 +20,11 @@
 		"body": [
 			"---",
 			"authors: ''",
+			"draft: false",
 			"year: YYYY",
 			"topics: ['','']",
 			"doi: ''",
 			"pmid: ''",
-			"draft: false",
 			"---",
 			"",
 			""
@@ -37,9 +37,9 @@
 		"body": [
 			"---",
 			"title: ''",
+			"draft: false",
 			"topics: ['','']",
 			"category: ''",
-			"draft: false",
 			"---",
 			"",
 			""
@@ -68,10 +68,10 @@
 		"body": [
 			"---",
 			"title: ",
+			"draft: false",
 			"date: 'YYYY-MM-DD'",
 			"layout: PostBanner/PostSimple/PostLayout",
 			"summary: ",
-			"draft: false",
 			"---",
 			"",
 			""
