@@ -31,13 +31,13 @@ const headerNavLinks = [
       },
     ],
   },
-  { href: '/octava', title: 'OCTAVA' },
   { href: '/contact', title: 'Contact' },
   {
     href: '/people/member',
     title: 'People',
     hrefs: [
-      { title: 'Current Members', href: '/people/member' },
+      { title: 'Team Members', href: '/people/member' },
+      { title: 'Alumni', href: '/people/alumni' },
       { title: 'Collaborators', href: '/people/collaborator' },
     ],
   },

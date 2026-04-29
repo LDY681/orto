@@ -196,6 +196,11 @@ export default function ListLayoutWithCategories({
                             ))}
                           </div>
                         </div>
+                        {href && (
+                          <Link href={href} className="text-sm font-medium text-primary-400">
+                            Learn More -&gt;
+                          </Link>
+                        )}
                         <RatingsAndComments
                           key={title}
                           slug={title}
@@ -203,11 +208,6 @@ export default function ListLayoutWithCategories({
                           average={post.rating_average}
                           count={post.rating_count}
                         />
-                        {href && (
-                          <Link href={href} className="text-sm font-medium text-primary-400">
-                            Learn More -&gt;
-                          </Link>
-                        )}
                       </div>
                     </article>
                   </li>

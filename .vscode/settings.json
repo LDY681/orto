@@ -3,5 +3,5 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "editor.eol": "\n",
+  "files.eol": "\n",
 }

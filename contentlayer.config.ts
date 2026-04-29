@@ -217,6 +217,7 @@ export const Authors = defineDocumentType(() => ({
     github: { type: 'string' },
     layout: { type: 'string' },
     role: { type: 'string', default: 'member' },
+    index: { type: 'number' },
     nested: { type: 'boolean', default: false },
   },
   computedFields,

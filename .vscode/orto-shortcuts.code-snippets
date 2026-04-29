@@ -52,10 +52,11 @@
 		"body": [
 			"---",
 			"name: ",
-			"avatar: /static/images/avatars/XXX.jpg",
+			"avatar: /static/images/avatar.png",
 			"occupation: ",
 			"company: ",
-			"role: member/collaborator",
+			"role: member/collaborator/alumni",
+			"index: ",
 			"---",
 			"",
 			""
