@@ -110,16 +110,49 @@ function createResourceCount(files) {
 }
 
 // TODO maybe include publications/topics in the future
-function createSearchIndex(allBlogs) {
+function createSearchIndex(allBlogs, allPublications, allResources) {
+  const topLevelSlugs = ['octava', 'about']
   if (
     siteMetadata?.search?.provider === 'kbar' &&
     siteMetadata.search.kbarConfig.searchDocumentsPath
   ) {
+
+    // blogs pages + top level pages
+    const blogArray = allCoreContent(sortPosts(allBlogs as any[]).map((post) => {
+      const slug = post?.slug
+      if (topLevelSlugs.includes(slug)) {
+        return {
+          ...post,
+          'path': `${slug}`
+        }
+      }
+      return post;
+    }))
+
+    // publication pages with article name as title and authors as subtitle
+    const pubArray = allCoreContent(allPublications.map((pub) => {
+      const title = pub.body.raw.trim().split('.')[0]
+      const path = pub._raw.flattenedPath.replace("/", "#")
+      return {
+        ...pub,
+        title,
+        path,
+      }
+    }))
+
+    // resource pages with title as title and category as subtitle
+    const resArray = allCoreContent(allResources.map((pub) => {
+      let path = 'resource/' + pub?.category?.split(' ').join('-').toLowerCase() + '#' + pub?.title
+      return {
+        ...pub,
+        path,
+      }
+    }))
+
     writeFileSync(
       `public/${path.basename(siteMetadata.search.kbarConfig.searchDocumentsPath)}`,
-      JSON.stringify(allCoreContent(sortPosts(allBlogs)))
+      JSON.stringify([...blogArray, ...pubArray, ...resArray])
     )
-    console.log('Local search index generated...')
   }
 }
 
@@ -260,6 +293,6 @@ export default makeSource({
     createRecordCount(allBlogs, "tag")
     createRecordCount(allPublications, "topic")
     createResourceCount(allResources)
-    createSearchIndex(allBlogs)
+    createSearchIndex(allBlogs, allPublications, allResources)
   },
 })

@@ -182,7 +182,7 @@ export default function ListLayoutWithCategories({
               {ratedDisplayPosts.map((post, index) => {
                 const { title, code, topics, href } = post
                 return (
-                  <li key={index} className="py-5">
+                  <li key={index} className="py-5" id={title}>
                     <article className="flex flex-col space-y-2 xl:space-y-0">
                       <div className="space-y-3">
                         <div>

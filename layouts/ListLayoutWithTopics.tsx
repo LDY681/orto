@@ -125,9 +125,13 @@ export default function ListLayoutWithTopics({
           <div>
             <ul>
               {displayPosts.map((post) => {
-                const { authors, year, code, topics, doi, pmid, website } = post
+                const { authors, year, code, topics, doi, pmid, website, _id, _raw } = post
                 return (
-                  <li key={doi} className="py-5">
+                  <li
+                    key={doi}
+                    id={`${_raw.flattenedPath.replace('publication/', '').split('.')?.[0] || _id}`}
+                    className="py-5"
+                  >
                     <article className="flex flex-col space-y-2 xl:space-y-0">
                       <div className="space-y-3">
                         <div>
