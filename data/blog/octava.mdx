@@ -7,7 +7,7 @@ layout: PostLayout
 summary: OCTAVA is an open-source software designed for the automated extraction and quantitative analysis of OCTA-derived microvascular metrics from en-face images downloaded from the OCTA camera. OCTAVA provides a user-friendly graphical interface that facilitates detailed, non-invasive analysis of retinal, optic nerve head, and skin blood vessels, which is crucial for studying and diagnosing vascular diseases. The software does not provide automated image quality assessment; users are therefore responsible for evaluating image quality independently.
 ---
 
-# OCTAVA – Optical Coherence Tomography Angiography Vascular Analyser 
+# OCTAVA – Optical Coherence Tomography Angiography Vascular Analyser
 **OCTAVA** is an open-source software designed for the automated extraction and quantitative analysis of OCTA-derived microvascular metrics from en-face images downloaded from the OCTA camera. OCTAVA provides a user-friendly graphical interface that facilitates detailed, non-invasive analysis of retinal, optic nerve head, and skin blood vessels, which is crucial for studying and diagnosing vascular diseases. The software does not provide automated image quality assessment; <span className="text-red-500">users are therefore responsible for evaluating image quality independently.</span>
 
 > When using OCTAVA, cite the following peer-reviewed articles:
@@ -23,7 +23,10 @@ Untracht, G. R., Matos, R. S., Dikaios, N., Bapir, M., Durrani, A. K., Butsabong
 OCTAVA: An open-source toolbox for quantitative analysis of optical coherence tomography angiography images. PloS one, 16(12), e0261052.
 https://doi.org/10.1371/journal.pone.0261052 
 ```
-<br/>
+
+# Table of Content
+<TOCInline toc={props.toc} exclude={["OCTAVA – Optical Coherence Tomography Angiography Vascular Analyser", "Table of Content"]} toHeading={2} />
+
 # How to Use OCTAVA
 OCTAVA Graphical User Interface (GUI) is an intuitive interface featuring buttons, dropdown menus, and real-time visualisation panels for seamless user interaction.
 
@@ -37,7 +40,6 @@ First, vessels in the image are segmented using filtering and binarisation techn
 
 OCTAVA supports both single- and batch-processing, enhancing its utility for handling large-scale studies.
 
-<br/>
 # OCTAVA OUTPUT
 ## OCTA-derived Microvascular Metrics
 OCTAVA can calculate multiple OCTA-derived metrics, summarised in the table below. The metrics are saved in an Excel file to facilitate easy compilation of data from multiple subjects. When batch processing is selected, multiple input images can be analysed automatically. For each image, a separate output folder is created to store the corresponding results. Additionally, a summary Excel file is generated that consolidates the output data from all processed images.
@@ -61,18 +63,14 @@ FAZ circularity	| *1*	| Binarised	| FAZ area multiplied by 4π divided by FAZ pe
 FAZ acircularity index	| *1*	| Binarised	| Ratio between the measured perimeter and the perimeter of a circular area of the same size. Indication of elongation of the FAZ. | <ThumbNail src="/static/images/octava/illustration_12.png" alt="illustration 12" width={200} height={200} />
 Foveal avascular density 300 (FD-300)	| *%*	| Binarised	| Percentage of the area occupied by vessels (white pixels) divided by the area in a 300-μm width rim surrounding the FAZ. This rim width value was originally chosen based on the relationship between FAZ and ganglion cell complex thickness in normal eyes to better distinguish between normal variations in FAZ and those due to pathology.	| <ThumbNail src="/static/images/octava/illustration_13.png" alt="illustration 13" width={200} height={200} />
 
-
- 
-<br/>
 # SOFTWARE AVAILABILITY and INSTALLATION
 MATLAB source code: ~~TODO~~  
 Python source code: ~~TODO~~  
 PC Stand-alone version: ~~TODO~~  
 Mac Stand-alone version: ~~TODO~~   
-Dataset with OCTAVA-generated output for testing: ~~TODO~~  
+Dataset with OCTAVA-generated output for testing: ~~TODO~~
 
-<br/>
-# AUTHORS:
+# AUTHORS
 The following individuals made substantial intellectual contributions to the design, implementation, and maintenance of the OCTAVA 3.0 software and take responsibility for its content:  
 -	**Danuta Sampson** (Lions Eye Institute)
 -	**Mila Zhang** (Lions Eye Institute)
@@ -80,7 +78,7 @@ The following individuals made substantial intellectual contributions to the des
 -	**Gavrielle Untracht** (Technical University of Denmark)
 -	**Madeleine Torcasso** (University of Chicago)
 
-#  CONTRIBUTORS:  
+#  CONTRIBUTORS 
 We gratefully acknowledge the following individuals for their contributions to this project, including code translation and advancement, testing, debugging, and discussions:
 -	**Martin Utrera** (University of Chicago); partial code translation and extensions
 -	**Jiashuai Chai** (Lions Eye Institute); partial code translation and extensions
@@ -89,8 +87,8 @@ We gratefully acknowledge the following individuals for their contributions to t
 -	**Simon Hoffman** (Karlsruhe Institute of Technology); discussions; documentation feedback
 -	**Ondine Gordon** (Western Australia; consumer feedback); discussions; documentation feedback
 -	**Tim Benson** (Western Australia; consumer feedback); discussions; documentation feedback
-
-# CONTRIBUTION TAXONOMY:
+  
+# CONTRIBUTION TAXONOMY
 **Conceptualisation**: Sampson, Untracht & Torcasso  
 **Software architecture**: Zhang and Untracht  
 **Core implementation**: Binarisation (Zhang), Skeletonisation (Utrera & Chai), FAZ segmentation (Chow and Liu); ONH Module (Chai)  
