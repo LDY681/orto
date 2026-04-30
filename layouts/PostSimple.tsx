@@ -48,7 +48,7 @@ export default function PostLayout({
           </header>
           <div className="grid-rows-[auto_1fr] divide-y divide-gray-200 pb-8 dark:divide-gray-700 xl:divide-y-0">
             <div className="divide-y divide-gray-200 dark:divide-gray-700 xl:col-span-3 xl:row-span-2 xl:pb-0">
-              <div className="prose max-w-none pb-8 pt-10 dark:prose-invert">{children}</div>
+              <div className="prose prose-h1:mt-8 prose-h1:mb-6 prose-h2:mt-4 py-2 max-w-none dark:prose-invert">{children}</div>
             </div>
             {siteMetadata.comments && showComments && (
               <div className="pb-6 pt-6 text-center text-gray-700 dark:text-gray-300" id="comment">
