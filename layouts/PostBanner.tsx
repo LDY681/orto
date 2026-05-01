@@ -46,7 +46,9 @@ export default function PostMinimal({
               <PageTitle>{title}</PageTitle>
             </div>
           </div>
-          <div className="prose prose-h1:mt-8 prose-h1:mb-6 prose-h2:mt-4 py-2 max-w-none dark:prose-invert">{children}</div>
+          <div className="prose max-w-none py-2 dark:prose-invert prose-h1:mb-6 prose-h1:mt-8 prose-h2:mt-4">
+            {children}
+          </div>
           {siteMetadata.comments && showComments && (
             <div className="pb-6 pt-6 text-center text-gray-700 dark:text-gray-300" id="comment">
               <Comments slug={slug} />

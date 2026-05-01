@@ -103,7 +103,9 @@ export default function PostLayout({
               </dd>
             </dl>
             <div className="divide-y divide-gray-200 dark:divide-gray-700 xl:col-span-3 xl:row-span-2 xl:pb-0">
-              <div className="prose prose-h1:mt-8 prose-h1:mb-6 prose-h2:mt-4 py-2 max-w-none dark:prose-invert">{children}</div>
+              <div className="prose max-w-none py-2 dark:prose-invert prose-h1:mb-6 prose-h1:mt-8 prose-h2:mt-4">
+                {children}
+              </div>
               {/* hide sharing section in default post layout */}
               {/* <div className="pb-6 pt-6 text-sm text-gray-700 dark:text-gray-300">
                 <Link href={discussUrl(path)} rel="nofollow">
