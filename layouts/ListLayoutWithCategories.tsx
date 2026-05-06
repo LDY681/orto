@@ -180,15 +180,20 @@ export default function ListLayoutWithCategories({
           <div>
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
               {ratedDisplayPosts.map((post, index) => {
-                const { title, code, topics, href } = post
+                const { title, subtitle, code, topics, href } = post
                 return (
                   <li key={index} className="py-5" id={title}>
                     <article className="flex flex-col space-y-2 xl:space-y-0">
                       <div className="space-y-3">
                         <div>
-                          <div className="mb-2 text-2xl text-primary-500 dark:text-primary-400">
+                          <div className="text-2xl text-primary-500 dark:text-primary-400">
                             {title}
                           </div>
+                          {subtitle && (
+                            <div className="text-sm text-primary-300 dark:text-primary-200">
+                              {subtitle}
+                            </div>
+                          )}
                           <MDXLayoutRenderer code={code} />
                           <div className="flex flex-wrap">
                             {topics?.map((topic) => (

@@ -221,6 +221,7 @@ export const Resource = defineDocumentType(() => ({
   contentType: 'mdx',
   fields: {
     title: { type: 'string', required: true },
+    subtitle: { type: 'string'},
     topics: { type: 'list', of: { type: 'string' }, required: true },
     category: { type: 'string', required: true },
     href: { type: 'string' },
