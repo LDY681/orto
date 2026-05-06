@@ -30,13 +30,23 @@ https://doi.org/10.1371/journal.pone.0261052
 # How to Use OCTAVA
 OCTAVA Graphical User Interface (GUI) is an intuitive interface featuring buttons, dropdown menus, and real-time visualisation panels for seamless user interaction.
 
-~~PICTURE and DESCRIPTION HERE~~
+<Image
+  alt="OCTAVA GUI with menu options"
+  src="/static/images/octava/menu.png"
+  width={1212}
+  height={782}
+/>
 
 The user first selects the image type for analysis: Retina, optic nerve head (ONH), or skin and insert image size The image is then processed with a series of image-processing techniques to generate OCTA microvascular metrics and, where applicable, foveal avascular zone metrics.
 
 First, vessels in the image are segmented using filtering and binarisation techniques. Filtering enhances vessel visibility while reducing noise, improving overall image quality. The binarisation step then classifies pixels, assigning white to vessel structures and black to background noise. In the current version of OCTAVA, we use ……
 
-~~Raw Image, Binarised Image and Skeletonised Image Figure Panel Here~~
+<Image
+  alt="OCTAVA GUI after binarisation, skeletonisation and FAZ segmentation processed"
+  src="/static/images/octava/gui.png"
+  width={1212}
+  height={782}
+/>
 
 OCTAVA supports both single- and batch-processing, enhancing its utility for handling large-scale studies.
 
