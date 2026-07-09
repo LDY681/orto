@@ -23,6 +23,11 @@ const allowedOrigins = [
   "https://orto-blog.vercel.app",
   /^https:\/\/.*-open-research-tools-for-ophthalms-projects\.vercel\.app$/,
 ];
+
+const allOrigins = [
+  "*",
+];
+
 const FUNCTION_REGION = "australia-southeast1";
 const PROJECT_ID = "orto-blog";
 
@@ -185,7 +190,7 @@ exports.getRatingsAvg = https.onRequest({cors: allowedOrigins}, async (request, 
 
 /* On new rating created, send email to admin for approval
  */
-exports.sendEmail = onDocumentCreated("ratings/{id}", async (event) => {
+exports.sendApprovalEmail = onDocumentCreated("ratings/{id}", async (event) => {
   const id = event.params.id;
   const snapshot = event.data;
 
@@ -241,6 +246,100 @@ exports.approveRating = https.onRequest(async (request, response) => {
     response.status(200).json({message: "Rating approved successfully."});
   } catch (error) {
     console.error("Error approving rating:", error);
+    response.status(500).json({message: "Internal server error."});
+  }
+});
+
+/**
+ * Send email to admin after feedback is collected
+ * @param {string} tag - email title starts with "[$TAG] New Feedback from $NAME" (OCTAVA, MAP, etc.)
+ * @param {string} template - handlebars template name (feedback, subscribe, etc.)
+ * @param {object} payload
+ */
+async function sendEmail(tag = "OCTAVA", template = "feedback", payload) {
+  const {name, email, ...obj} = payload;
+  const mailOptions = {
+    from: process.env.NEXT_PUBLIC_EMAIL_SMTP_SENDER,
+    to: process.env.NEXT_PUBLIC_EMAIL_SMTP_RECIPIENT,
+    template, // match the name of handlebars files
+    subject: `[${tag}] New ${template.toUpperCase()} from ${name}`,
+    context: {
+      name: `${name} (${email})`,
+      ...obj,
+      createdAt: new Date().toLocaleString(),
+    },
+  };
+  return mailTransporter.sendMail(mailOptions);
+}
+
+/**
+ * Universal send feedback function, invoke by POST request
+    * @param {string} name
+    * @param {string} email
+    * @param {string} message
+    * @param {string} collectionId - (octava_feedback, map_feedback, etc.)
+    * @param {string} tag - email title starts with "[$TAG] New Feedback from $NAME" (OCTAVA, MAP, etc.)
+    * @param {string} image (base64 string) - optional (For Fiona's MAP OCTA)
+    * @param {boolean} isSubscribed - optional (For Fiona's MAP OCTA)
+    * @return {response}
+ */
+exports.feedback = https.onRequest({cors: allOrigins}, async (request, response) => {
+  try {
+    if (request.method !== "POST") {
+      return response.status(405).json({message: "This Endpoint is only for POST request."});
+    }
+
+    // Fetch params
+    request.body = JSON.parse(request.body?? {}) || {};
+    const {name, email, message, collectionId = "octava_feedback", tag = "OCTAVA"} = request.body;
+
+    if (!name || !email || !message) {
+      return response.status(400).json({message: "Missing required fields: name, email, message."});
+    }
+
+    const collectionRef = db.collection(collectionId);
+    const resData = await collectionRef.doc(`${name}-${email}`).set({
+      ...request.body,
+    }).then(() => {
+      return sendEmail(tag, "feedback", request.body);
+    });
+    response.status(200).json({message: "Feedback created successfully.", data: resData});
+  } catch (error) {
+    console.error("Error creating new feedback:", error);
+    response.status(500).json({message: "Internal server error."});
+  }
+});
+
+/**
+ * Universal subscription function, invoke by POST request
+ * @param {string} name
+ * @param {string} email
+ * @param {string} collectionId (octava_subscription)
+ * @return {response}
+ */
+exports.subscribe = https.onRequest({cors: allOrigins}, async (request, response) => {
+  try {
+    if (request.method !== "POST") {
+      return response.status(405).json({message: "This Endpoint is only for POST request."});
+    }
+
+    // Fetch params
+    request.body = JSON.parse(request.body?? {}) || {};
+    const {name, email, collectionId = "octava_subscription"} = request.body;
+
+    if (!name || !email) {
+      return response.status(400).json({message: "Missing required fields: name, email."});
+    }
+
+    const collectionRef = db.collection(collectionId);
+    const resData = await collectionRef.doc(`${name}-${email}`).set({
+      ...request.body,
+    }).then(() => {
+      return sendEmail("OCTAVA", "subscribe", request.body);
+    });
+    response.status(200).json({message: "Subscription created successfully.", data: resData});
+  } catch (error) {
+    console.error("Error creating new subscription:", error);
     response.status(500).json({message: "Internal server error."});
   }
 });
