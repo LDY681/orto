@@ -1,5 +1,8 @@
 module.exports = {
   root: true,
+  ignorePatterns: [
+    "out/",
+  ],
   env: {
     es6: true,
     node: true,

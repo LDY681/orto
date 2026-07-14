@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>New Feedback from {{ name }}</title>
+</head>
+<body>
+  <h2>You have received a new feedback from {{ name }}! </h2>
+  <p style="font-weight: 600">Message:</p>
+  <p style="font-weight: 400">{{ message }}</p>
+  {{#if image }}
+    <p style="font-weight: 600">Attachment:</p>
+    <p style="font-weight: 400"><img src="{{ image }}" alt="Attachment" /></p>
+    <a href="{{ image }}" download>Download Attachment</a>
+  {{/if}}
+  <p> Create At: {{ createdAt }} </p>
+</body>
+</html>

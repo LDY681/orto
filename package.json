@@ -8,7 +8,8 @@
     "build": "cross-env INIT_CWD=. next build",
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
-    "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts"
+    "lint": "next lint --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
+    "lint:fix": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts"
   },
   "dependencies": {
     "@headlessui/react": "2.2.0",
