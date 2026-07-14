@@ -77,7 +77,7 @@ mailTransporter.use("compile", hbs(hbsOptions));
 
 /**
  * Create sha256 hmac token for client side's link
- *
+ * @method createApprovalToken
  * @param {string} id - The ID of the rating to be approved.
  * @return {string} A token that can be included in the approval link.
  */
@@ -93,7 +93,7 @@ function createApprovalToken(id) {
 
 /**
  * Verify the approval token and extract the rating ID.
- *
+ * @method verifyAndExtractId
  * @param {string} token - The approval token to verify.
  * @return {string} The ID of the rating to be approved.
  */
@@ -120,7 +120,11 @@ function verifyAndExtractId(token) {
   return Buffer.from(payload, "base64url").toString("utf8");
 }
 
-/* On rating updated (approved), update the rating average and counter
+/**
+ * On rating updated (approved), update the rating average and counter
+ * @method updateRating
+ * @param {object} event - Event data containing the updated rating document.
+ * @return {Promise}
  */
 exports.updateRating = onDocumentUpdated("ratings/{id}", async (event) => {
   const evtSnapshot = event.data;
@@ -168,8 +172,12 @@ exports.updateRating = onDocumentUpdated("ratings/{id}", async (event) => {
   }
 });
 
-/*
- * Get ratings_avg for all titles
+/**
+ * Get average ratings and count for all titles
+ * Response are cached for 1 hour to reduce traffic
+ * Only allowOrigins can request this endpoint
+ * @method getRatingsAvg
+ * @return {Promise<object>} A list of average ratings and counts for all titles.
  */
 exports.getRatingsAvg = https.onRequest({cors: allowedOrigins}, async (request, response) => {
   try {
@@ -188,7 +196,11 @@ exports.getRatingsAvg = https.onRequest({cors: allowedOrigins}, async (request, 
   }
 });
 
-/* On new rating created, send email to admin for approval
+/**
+ * On new rating created, send email to admin for approval
+ * @method sendApprovalEmail
+ * @param {object} event - Event data containing the new rating document.
+ * @return {Promis}
  */
 exports.sendApprovalEmail = onDocumentCreated("ratings/{id}", async (event) => {
   const id = event.params.id;
@@ -225,6 +237,11 @@ exports.sendApprovalEmail = onDocumentCreated("ratings/{id}", async (event) => {
   return mailTransporter.sendMail(mailOptions);
 });
 
+/**
+ * On approval link clicked, mark rating status as approved
+ * @method approveRating
+ * @return {Promise}
+ */
 exports.approveRating = https.onRequest(async (request, response) => {
   try {
     const token = request.query.token || request.body?.token;
@@ -252,9 +269,10 @@ exports.approveRating = https.onRequest(async (request, response) => {
 
 /**
  * Send email to admin after feedback is collected
+ * @method sendEmail
  * @param {string} tag - email title starts with "[$TAG] New Feedback from $NAME" (OCTAVA, MAP, etc.)
- * @param {string} template - handlebars template name (feedback, subscribe, etc.)
- * @param {object} payload
+ * @param {string} template - email templates to use (feedback, subscribe, etc.)
+ * @param {object} payload - request.body
  */
 async function sendEmail(tag = "OCTAVA", template = "feedback", payload) {
   const {name, email, ...obj} = payload;
@@ -274,14 +292,18 @@ async function sendEmail(tag = "OCTAVA", template = "feedback", payload) {
 
 /**
  * Universal send feedback function, invoke by POST request
-    * @param {string} name
-    * @param {string} email
-    * @param {string} message
-    * @param {string} collectionId - (octava_feedback, map_feedback, etc.)
-    * @param {string} tag - email title starts with "[$TAG] New Feedback from $NAME" (OCTAVA, MAP, etc.)
-    * @param {string} image (base64 string) - optional (For Fiona's MAP OCTA)
-    * @param {boolean} isSubscribed - optional (For Fiona's MAP OCTA)
-    * @return {response}
+ * Save feedback form to firestore
+ * Save image to storage if provided
+ * Send email to admin with feedback details
+ * @method feedback
+ * @param {string} name - contact name
+ * @param {string} email - contact email
+ * @param {string} message - feedback message
+ * @param {string} collectionId - which table to store (octava_feedback, map_feedback, etc.)
+ * @param {string} tag - email title starts with "[$TAG] New Feedback from $NAME" (OCTAVA, MAP, etc.)
+ * @param {string} image (base64 data URI string) - optional allow to store and send image attachment
+ * @param {boolean} isSubscribed - optional (For Fiona's MAP OCTA, meaning user wants to follow feedback updates)
+ * @return {Promise}
  */
 exports.feedback = https.onRequest({cors: allOrigins}, async (request, response) => {
   try {
@@ -290,18 +312,42 @@ exports.feedback = https.onRequest({cors: allOrigins}, async (request, response)
     }
 
     // Fetch params
-    request.body = JSON.parse(request.body?? {}) || {};
-    const {name, email, message, collectionId = "octava_feedback", tag = "OCTAVA"} = request.body;
+    const body = (typeof request.body === "string" ? JSON.parse(request.body) : request.body) ?? {};
+    const {name, email, message, collectionId = "octava_feedback", tag = "OCTAVA", image, ...rest} = body;
 
     if (!name || !email || !message) {
       return response.status(400).json({message: "Missing required fields: name, email, message."});
     }
 
+    // Build the Firestore record
+    const record = {name, email, message, collectionId, tag, ...rest};
+
+    // Optional image: decode base64, upload to Storage, store URL in the record
+    if (image) {
+      const dataUrlMatch = image.match(/^data:([^;]+);base64,(.+)$/s);
+      const mimeType = dataUrlMatch ? dataUrlMatch[1] : "image/jpeg";
+      const base64Data = dataUrlMatch ? dataUrlMatch[2] : image;
+      const ext = (mimeType.split("/")[1] || "jpeg").split("+")[0];
+      const fileName = `feedback/${collectionId}/${name}-${Date.now()}.${ext}`;
+
+      const bucket = admin.storage().bucket();
+      const file = bucket.file(fileName);
+      const downloadToken = crypto.randomUUID();
+
+      await file.save(Buffer.from(base64Data, "base64"), {
+        metadata: {contentType: mimeType},
+      });
+      // Fetch download token to compose the preview URL
+      await file.setMetadata({
+        metadata: {firebaseStorageDownloadTokens: downloadToken},
+      });
+
+      record.image = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${downloadToken}`;
+    }
+
     const collectionRef = db.collection(collectionId);
-    const resData = await collectionRef.doc(`${name}-${email}`).set({
-      ...request.body,
-    }).then(() => {
-      return sendEmail(tag, "feedback", request.body);
+    const resData = await collectionRef.doc(`${name}-${email}`).set(record).then(() => {
+      return sendEmail(tag, "feedback", record);
     });
     response.status(200).json({message: "Feedback created successfully.", data: resData});
   } catch (error) {
@@ -312,10 +358,13 @@ exports.feedback = https.onRequest({cors: allOrigins}, async (request, response)
 
 /**
  * Universal subscription function, invoke by POST request
- * @param {string} name
- * @param {string} email
- * @param {string} collectionId (octava_subscription)
- * @return {response}
+ * Save subscription details to firestore
+ * Send email to admin with subscriber details
+ * @method subscribe
+ * @param {string} name - contact name
+ * @param {string} email - contact email
+ * @param {string} collectionId - which table to store (octava_subscription)
+ * @return {Promise}
  */
 exports.subscribe = https.onRequest({cors: allOrigins}, async (request, response) => {
   try {
@@ -324,8 +373,8 @@ exports.subscribe = https.onRequest({cors: allOrigins}, async (request, response
     }
 
     // Fetch params
-    request.body = JSON.parse(request.body?? {}) || {};
-    const {name, email, collectionId = "octava_subscription"} = request.body;
+    const body = (typeof request.body === "string" ? JSON.parse(request.body) : request.body) ?? {};
+    const {name, email, collectionId = "octava_subscription"} = body;
 
     if (!name || !email) {
       return response.status(400).json({message: "Missing required fields: name, email."});
@@ -333,9 +382,9 @@ exports.subscribe = https.onRequest({cors: allOrigins}, async (request, response
 
     const collectionRef = db.collection(collectionId);
     const resData = await collectionRef.doc(`${name}-${email}`).set({
-      ...request.body,
+      ...body,
     }).then(() => {
-      return sendEmail("OCTAVA", "subscribe", request.body);
+      return sendEmail("OCTAVA", "subscribe", body);
     });
     response.status(200).json({message: "Subscription created successfully.", data: resData});
   } catch (error) {
