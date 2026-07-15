@@ -268,7 +268,7 @@ exports.approveRating = https.onRequest(async (request, response) => {
 });
 
 /**
- * Send email to admin after feedback is collected
+ * Send email to admin after feedback/subscription is collected
  * @method sendEmail
  * @param {string} tag - email title starts with "[$TAG] New Feedback from $NAME" (OCTAVA, MAP, etc.)
  * @param {string} template - email templates to use (feedback, subscribe, etc.)
@@ -297,12 +297,11 @@ async function sendEmail(tag = "OCTAVA", template = "feedback", payload) {
  * Send email to admin with feedback details
  * @method feedback
  * @param {string} name - contact name
- * @param {string} email - contact email
+ * @param {string} email - (optional) contact email
  * @param {string} message - feedback message
  * @param {string} collectionId - which table to store (octava_feedback, map_feedback, etc.)
  * @param {string} tag - email title starts with "[$TAG] New Feedback from $NAME" (OCTAVA, MAP, etc.)
- * @param {string} image (base64 data URI string) - optional allow to store and send image attachment
- * @param {boolean} isSubscribed - optional (For Fiona's MAP OCTA, meaning user wants to follow feedback updates)
+ * @param {string} image - (optional) allow to store and send image attachment (base64 data URI)
  * @return {Promise}
  */
 exports.feedback = https.onRequest({cors: allOrigins}, async (request, response) => {
@@ -313,10 +312,10 @@ exports.feedback = https.onRequest({cors: allOrigins}, async (request, response)
 
     // Fetch params
     const body = (typeof request.body === "string" ? JSON.parse(request.body) : request.body) ?? {};
-    const {name, email, message, collectionId = "octava_feedback", tag = "OCTAVA", image, ...rest} = body;
+    const {name, email = null, message, collectionId = "octava_feedback", tag = "OCTAVA", image, ...rest} = body;
 
-    if (!name || !email || !message) {
-      return response.status(400).json({message: "Missing required fields: name, email, message."});
+    if (!name || !message) {
+      return response.status(400).json({message: "Missing required fields: name, message."});
     }
 
     // Build the Firestore record
@@ -346,8 +345,12 @@ exports.feedback = https.onRequest({cors: allOrigins}, async (request, response)
     }
 
     const collectionRef = db.collection(collectionId);
-    const resData = await collectionRef.doc(`${name}-${email}`).set(record).then(() => {
-      return sendEmail(tag, "feedback", record);
+    const docId = `${name}-${email ?? "anonymous"}-${Date.now()}`;
+    const resData = await collectionRef.doc(docId).set(record).then(() => {
+      return sendEmail(tag, "feedback", {
+        ...record,
+        email: email ?? "Anonymous",
+      });
     });
     response.status(200).json({message: "Feedback created successfully.", data: resData});
   } catch (error) {
@@ -363,7 +366,8 @@ exports.feedback = https.onRequest({cors: allOrigins}, async (request, response)
  * @method subscribe
  * @param {string} name - contact name
  * @param {string} email - contact email
- * @param {string} collectionId - which table to store (octava_subscription)
+ * @param {string} collectionId - which table to store (octava_subscription, map_subscription, etc.)
+ * @param {string} tag - email title starts with "[$TAG] New SUBSCRIBE from $NAME" (OCTAVA, MAP, etc.)
  * @return {Promise}
  */
 exports.subscribe = https.onRequest({cors: allOrigins}, async (request, response) => {
@@ -374,7 +378,7 @@ exports.subscribe = https.onRequest({cors: allOrigins}, async (request, response
 
     // Fetch params
     const body = (typeof request.body === "string" ? JSON.parse(request.body) : request.body) ?? {};
-    const {name, email, collectionId = "octava_subscription"} = body;
+    const {name, email, collectionId = "octava_subscription", tag = "OCTAVA"} = body;
 
     if (!name || !email) {
       return response.status(400).json({message: "Missing required fields: name, email."});
@@ -384,7 +388,7 @@ exports.subscribe = https.onRequest({cors: allOrigins}, async (request, response
     const resData = await collectionRef.doc(`${name}-${email}`).set({
       ...body,
     }).then(() => {
-      return sendEmail("OCTAVA", "subscribe", body);
+      return sendEmail(tag, "subscribe", body);
     });
     response.status(200).json({message: "Subscription created successfully.", data: resData});
   } catch (error) {
