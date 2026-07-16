@@ -6,12 +6,13 @@ async function createExportTable(allPublications, allResources, filename = 'data
   const workbook = new ExcelJS.Workbook()
   const pubSheet = workbook.addWorksheet('Publication')
   pubSheet.columns = [
-    { header: 'body', key: 'body' },
+    { header: 'Body', key: 'body' },
     { header: 'Authors', key: 'authors' },
     { header: 'Year', key: 'year' },
     { header: 'Topics', key: 'topics' },
     { header: 'DOI', key: 'doi' },
     { header: 'PMID', key: 'pmid' },
+    { header: 'Filename', key: 'filename' },
   ]
   pubSheet.properties.defaultRowHeight = 30
   pubSheet.properties.defaultColWidth = 40
@@ -33,7 +34,10 @@ async function createExportTable(allPublications, allResources, filename = 'data
   pubSheet.getCell('F1').style = {
     fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ff5df542' } },
   }
-
+  pubSheet.getCell('G1').style = {
+    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ff329ea8' } },
+  }
+  
   const resSheet = workbook.addWorksheet('Resource')
   resSheet.columns = [
     { header: 'Body', key: 'body' },
@@ -41,6 +45,7 @@ async function createExportTable(allPublications, allResources, filename = 'data
     { header: 'Subtitle', key: 'subtitle' },
     { header: 'Topics', key: 'topics' },
     { header: 'Category', key: 'category' },
+    { header: 'Filename', key: 'filename' },
   ]
   resSheet.properties.defaultRowHeight = 30
   resSheet.properties.defaultColWidth = 40
@@ -59,7 +64,11 @@ async function createExportTable(allPublications, allResources, filename = 'data
   resSheet.getCell('E1').style = {
     fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ffe580ff' } },
   }
+  resSheet.getCell('F1').style = {
+    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'ff329ea8' } },
+  }
 
+  console.log(allPublications[0])
   for (const pub of allPublications) {
     const {
       body: { raw: body },
@@ -68,8 +77,9 @@ async function createExportTable(allPublications, allResources, filename = 'data
       topics,
       doi,
       pmid,
+      _raw: { sourceFileName: filename}
     } = pub
-    pubSheet.addRow({ body: body.trim(), authors, year, topics, doi, pmid })
+    pubSheet.addRow({ body: body.trim(), authors, year, topics, doi, pmid, filename })
   }
 
   for (const res of allResources) {
@@ -79,8 +89,9 @@ async function createExportTable(allPublications, allResources, filename = 'data
       subtitle,
       topics,
       category,
+      _raw: { sourceFileName: filename}
     } = res
-    resSheet.addRow({ body: body.trim(), title, subtitle, topics, category })
+    resSheet.addRow({ body: body.trim(), title, subtitle, topics, category, filename })
   }
 
   await workbook.xlsx.writeFile(filename)

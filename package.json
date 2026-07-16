@@ -10,7 +10,8 @@
     "analyze": "cross-env ANALYZE=true next build",
     "lint": "next lint --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
     "lint:fix": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
-    "export": "npx tsx data2excel.mts"
+    "export": "npx tsx data2excel.mts",
+    "import": "npx tsx excel2data.mts"
   },
   "dependencies": {
     "@headlessui/react": "2.2.0",
