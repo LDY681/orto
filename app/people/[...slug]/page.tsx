@@ -20,9 +20,8 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
     })
 
   const titleMaps = {
-    member: 'Team Members',
-    alumni: 'Alumni',
-    collaborator: 'Collaborators',
+    founder: 'Founders',
+    contributor: 'Contributors',
   }
   return (
     <>

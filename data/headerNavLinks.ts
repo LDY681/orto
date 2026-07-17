@@ -33,12 +33,11 @@ const headerNavLinks = [
   },
   { href: '/contact', title: 'Contact' },
   {
-    href: '/people/member',
+    href: '/people/founder',
     title: 'People',
     hrefs: [
-      { title: 'Team Members', href: '/people/member' },
-      { title: 'Alumni', href: '/people/alumni' },
-      { title: 'Collaborators', href: '/people/collaborator' },
+      { title: 'Founders', href: '/people/founder' },
+      { title: 'Contributors', href: '/people/contributor' },
     ],
   },
 ]
