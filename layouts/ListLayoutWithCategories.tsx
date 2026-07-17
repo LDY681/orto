@@ -191,7 +191,7 @@ export default function ListLayoutWithCategories({
                           </div>
                           {subtitle && (
                             <div className="text-sm text-primary-300 dark:text-primary-200">
-                              {subtitle}
+                              <MDXLayoutRenderer code={subtitle?.code}></MDXLayoutRenderer>
                             </div>
                           )}
                           <MDXLayoutRenderer code={code} />
