@@ -1,14 +1,16 @@
 import ExcelJS from 'exceljs'
 import { allPublications, allResources } from './.contentlayer/generated/index.mjs'
+import readline from 'node:readline/promises';
+import { stdin as input, stdout as output } from 'node:process';
 
 async function createExportTable(allPublications, allResources, filename = 'data.xlsx') {
   console.log("Make sure to run 'npm run build' to generate the newest ./.contentlayer/generated before exporting...")
   const workbook = new ExcelJS.Workbook()
   const pubSheet = workbook.addWorksheet('Publication')
   pubSheet.columns = [
-    { header: 'Body', key: 'body' },
     { header: 'Authors', key: 'authors' },
     { header: 'Year', key: 'year' },
+    { header: 'Body', key: 'body' },
     { header: 'Topics', key: 'topics' },
     { header: 'DOI', key: 'doi' },
     { header: 'PMID', key: 'pmid' },
@@ -40,9 +42,9 @@ async function createExportTable(allPublications, allResources, filename = 'data
   
   const resSheet = workbook.addWorksheet('Resource')
   resSheet.columns = [
-    { header: 'Body', key: 'body' },
     { header: 'Title', key: 'title' },
     { header: 'Subtitle', key: 'subtitle' },
+    { header: 'Body', key: 'body' },
     { header: 'Topics', key: 'topics' },
     { header: 'Category', key: 'category' },
     { header: 'Filename', key: 'filename' },
@@ -79,23 +81,36 @@ async function createExportTable(allPublications, allResources, filename = 'data
       pmid,
       _raw: { sourceFileName: filename}
     } = pub
-    pubSheet.addRow({ body: body.trim(), authors, year, topics, doi, pmid, filename })
+    pubSheet.addRow({ authors, year, body: body.trim(), topics, doi, pmid, filename })
   }
 
   for (const res of allResources) {
     const {
       body: { raw: body },
       title,
-      subtitle,
+      subtitle: { raw: subtitle },
       topics,
       category,
       _raw: { sourceFileName: filename}
     } = res
-    resSheet.addRow({ body: body.trim(), title, subtitle, topics, category, filename })
+    resSheet.addRow({ title, subtitle: subtitle.trim(), body: body.trim(), topics, category, filename })
   }
 
   await workbook.xlsx.writeFile(filename)
   console.log(`Written to ${filename}`)
 }
 
-createExportTable(allPublications, allResources)
+async function main() {
+  const rl = readline.createInterface({ input, output });
+  const answerConfirm = await rl.question('This will overwrite the existing Excel file, are you sure you want to continue? (y/n) ');
+  if (answerConfirm.toLowerCase() !== 'y') {
+    return rl.close();
+  }
+
+    const answerFilename = await rl.question('Please enter the name to the Excel file (default: data.xlsx): ');
+    const filename = answerFilename.trim() || 'data.xlsx';
+    rl.close();
+  
+  await createExportTable(allPublications, allResources, filename)
+}
+main()

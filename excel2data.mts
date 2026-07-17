@@ -14,9 +14,9 @@ async function readImportTable(allPublications, allResources, filename = 'data.x
     if (idx == 1) return; // skip header row
 
     const rowNumber = row.number;
-    const body = (row.getCell(1).value ?? '').toString();
-    const authors = (row.getCell(2).value ?? '').toString();
-    const year = (row.getCell(3).value ?? '').toString();
+    const authors = (row.getCell(1).value ?? '').toString();
+    const year = (row.getCell(2).value ?? '').toString();
+    const body = (row.getCell(3).value ?? '').toString();
     const topics = (row.getCell(4).value ?? '').toString();
     const doi = (row.getCell(5).value ?? '').toString();
     const pmid = (row.getCell(6).value ?? '').toString();
@@ -45,9 +45,9 @@ async function readImportTable(allPublications, allResources, filename = 'data.x
     if (idx == 1) return; // skip header row
 
     const rowNumber = row.number;
-    const body = (row.getCell(1).value ?? '').toString();
-    const title = (row.getCell(2).value ?? '').toString();
-    const subtitle = (row.getCell(3).value ?? '').toString();
+    const title = (row.getCell(1).value ?? '').toString();
+    const subtitle = (row.getCell(2).value ?? '').toString();
+    const body = (row.getCell(3).value ?? '').toString();
     const topics = (row.getCell(4).value ?? '').toString();
     const category = (row.getCell(5).value ?? '').toString();
     const filename = (row.getCell(6).value ?? '').toString();
