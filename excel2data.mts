@@ -21,7 +21,7 @@ async function readImportTable(allPublications, allResources, filename = 'data.x
     const doi = (row.getCell(5).text ?? '').toString(); // text() sanitize both hyperlink object and plain text 
     const pmid = (row.getCell(6).text ?? '').toString(); // text() sanitize both hyperlink object and plain text 
     // Remove invalid symbols in filenames for windows < (less than) > (greater than) : (colon) “ (double quote) / (forward slash) \ (backslash) | (vertical bar or pipe) ? (question mark) * (asterisk)
-    const filename = (row.getCell(7).text ?? '').toString().replace(/[\<\>\:\\\/\|\?\*]+/g, '');
+    const filename = (row.getCell(7).text ?? '').toString().replace(/[\<\>\:\\\/\|\?\*]+/g, '').trim();
     console.log(`Row ${rowNumber}: Body=${body}, Authors=${authors}, Year=${year}, Topics=${topics}, DOI=${doi}, PMID=${pmid}, Filename=${filename}`);
 
     if (!filename) return; // skip if filename is empty
@@ -51,7 +51,7 @@ async function readImportTable(allPublications, allResources, filename = 'data.x
     const topics = (row.getCell(4).text ?? '').toString();
     const category = (row.getCell(5).text ?? '').toString();
     // Remove invalid symbols in filenames for windows < (less than) > (greater than) : (colon) “ (double quote) / (forward slash) \ (backslash) | (vertical bar or pipe) ? (question mark) * (asterisk)
-    const filename = (row.getCell(6).text ?? '').toString().replace(/[\<\>\:\\\/\|\?\*]+/g, '');
+    const filename = (row.getCell(6).text ?? '').toString().replace(/[\<\>\:\\\/\|\?\*]+/g, '').trim();
     console.log(`Row ${rowNumber}: Body=${body}, Title=${title}, Subtitle=${subtitle}, Topics=${topics}, Category=${category}, Filename=${filename}`);
 
     if (!filename) return; // skip if filename is empty
