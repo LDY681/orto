@@ -14,14 +14,14 @@ async function readImportTable(allPublications, allResources, filename = 'data.x
     if (idx == 1) return; // skip header row
 
     const rowNumber = row.number;
-    const authors = (row.getCell(1).value ?? '').toString();
-    const year = (row.getCell(2).value ?? '').toString();
-    const body = (row.getCell(3).value ?? '').toString();
-    const topics = (row.getCell(4).value ?? '').toString();
-    const doi = (row.getCell(5).value ?? '').toString();
-    const pmid = (row.getCell(6).value ?? '').toString();
-    const filename = (row.getCell(7).value ?? '').toString();
-
+    const authors = (row.getCell(1).text ?? '').toString();
+    const year = (row.getCell(2).text ?? '').toString();
+    const body = (row.getCell(3).text ?? '').toString();
+    const topics = (row.getCell(4).text ?? '').toString();
+    const doi = (row.getCell(5).text ?? '').toString(); // text() sanitize both hyperlink object and plain text 
+    const pmid = (row.getCell(6).text ?? '').toString(); // text() sanitize both hyperlink object and plain text 
+    // Remove invalid symbols in filenames for windows < (less than) > (greater than) : (colon) “ (double quote) / (forward slash) \ (backslash) | (vertical bar or pipe) ? (question mark) * (asterisk)
+    const filename = (row.getCell(7).text ?? '').toString().replace(/[\<\>\:\\\/\|\?\*]+/g, '');
     console.log(`Row ${rowNumber}: Body=${body}, Authors=${authors}, Year=${year}, Topics=${topics}, DOI=${doi}, PMID=${pmid}, Filename=${filename}`);
 
     if (!filename) return; // skip if filename is empty
@@ -45,13 +45,13 @@ async function readImportTable(allPublications, allResources, filename = 'data.x
     if (idx == 1) return; // skip header row
 
     const rowNumber = row.number;
-    const title = (row.getCell(1).value ?? '').toString();
-    const subtitle = (row.getCell(2).value ?? '').toString();
-    const body = (row.getCell(3).value ?? '').toString();
-    const topics = (row.getCell(4).value ?? '').toString();
-    const category = (row.getCell(5).value ?? '').toString();
-    const filename = (row.getCell(6).value ?? '').toString();
-
+    const title = (row.getCell(1).text ?? '').toString();
+    const subtitle = (row.getCell(2).text ?? '').toString();
+    const body = (row.getCell(3).text ?? '').toString();
+    const topics = (row.getCell(4).text ?? '').toString();
+    const category = (row.getCell(5).text ?? '').toString();
+    // Remove invalid symbols in filenames for windows < (less than) > (greater than) : (colon) “ (double quote) / (forward slash) \ (backslash) | (vertical bar or pipe) ? (question mark) * (asterisk)
+    const filename = (row.getCell(6).text ?? '').toString().replace(/[\<\>\:\\\/\|\?\*]+/g, '');
     console.log(`Row ${rowNumber}: Body=${body}, Title=${title}, Subtitle=${subtitle}, Topics=${topics}, Category=${category}, Filename=${filename}`);
 
     if (!filename) return; // skip if filename is empty
